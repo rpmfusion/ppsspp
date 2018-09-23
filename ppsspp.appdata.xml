@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop">
+  <id type="desktop">ppsspp.desktop</id>
+  <metadata_license>CC0-1.0</metadata_license>
+  <summary>A PSP emulator</summary>
+  <name>PPSSPP</name>
+  <project_license>GPL-2.0+ and BSD</project_license>
+  <categories>
+   <category>Games</category>
+   <category>ActionGame</category>
+   <category>Simulation</category>
+  </categories>
+  <description>
+    <p>
+       PPSSPP - a fast and portable PSP emulator.
+    </p>  
+  </description>
+  <releases>
+    <release version="1.6.3" date="2018-06-05">
+      <description>
+        <p>This is the current stable release</p>
+      </description>
+     </release>
+  </releases>
+  <url type="homepage">https://www.ppsspp.org//</url>
+  <screenshots>
+    <screenshot type="default">
+     <image>https://sagitter.fedorapeople.org/ppsspp/ppsspp1.png</image>
+    </screenshot>
+    <screenshot>
+     <image>https://sagitter.fedorapeople.org/ppsspp/ppsspp2.png</image>
+    </screenshot>
+  </screenshots>
+  <updatecontact>sagitter_at_fedoraproject.org</updatecontact>
+</component>
