@@ -4,29 +4,31 @@ ExcludeArch: %{power64}
 # -Wl,--as-needed breaks linking on fedora 30+ 
 %undefine _ld_as_needed
 
-%global commit 6d0ed4ad0700030f6e80b1f6a420b8983624e93d
+%global commit caa506bf2a253a99850a4248a1cb5a399f32467a
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global date 20180912
+%global date 20181027
 
 Name:           ppsspp
-Version:        1.6.3
-Release:        4.%{date}git%{shortcommit}%{?dist}
+Version:        1.7.0
+Release:        1%{?dist}
 Summary:        A PSP emulator
 License:        BSD and GPLv2+
 URL:            https://www.ppsspp.org/
 
-# git clone https://github.com/hrydgard/ppsspp.git
-# git checkout 6d0ed4ad0700030f6e80b1f6a420b8983624e93d
-## This commit coincides with a post-commit of release 1.6.3
+## This commit coincides with the commit of release 1.7.0
 ## We need to checkout it, then download relative submodules
 ## which are not included in the source code:
+##
+# git clone https://github.com/hrydgard/ppsspp.git
+# git checkout caa506bf2a253a99850a4248a1cb5a399f32467a
 # git submodule update --init ext/armips
 # git submodule update --init ext/glslang
 # git submodule update --init ext/SPIRV-Cross
 # git submodule update --init ext/discord-rpc
 # rm -rf ppsspp/.git ppsspp/.gitignore
-# tar -czvf ppsspp-%%{shortcommit}.tar.gz ppsspp
-Source0:        https://github.com/hrydgard/%{name}/archive/%{commit}/%{name}-%{shortcommit}.tar.gz
+# tar -czvf ppsspp-%%{version}.tar.gz ppsspp
+##
+Source0:        ppsspp-%{version}.tar.gz
 Source1:        %{name}.desktop
 Source2:        %{name}.appdata.xml
 
@@ -45,6 +47,7 @@ BuildRequires:  snappy-devel
 BuildRequires:  SDL2-devel
 BuildRequires:  gcc, gcc-c++
 BuildRequires:  libzip-devel
+BuildRequires:  zlib-devel
 BuildRequires:  glew-devel
 BuildRequires:  libGL-devel
 BuildRequires:  qt5-qtbase-devel
@@ -162,6 +165,10 @@ appstream-util validate-relax --nonet %{buildroot}%{_metainfodir}/*.appdata.xml
 
 
 %changelog
+* Sat Oct 27 2018 Antonio Trande <sagitter@fedoraproject.org> - 1.7.0-1
+- Release 1.7.0
+- Enable GLES2 option
+
 * Wed Sep 12 2018 Antonio Trande <sagitter@fedoraproject.org> - 1.6.3-4.20180912git6d0ed4a
 - Enable USE_WAYLAND_WSI
 - Install runtime libraries
