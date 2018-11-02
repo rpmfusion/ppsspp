@@ -4,12 +4,12 @@ ExcludeArch: %{power64}
 # -Wl,--as-needed breaks linking on fedora 30+ 
 %undefine _ld_as_needed
 
-%global commit caa506bf2a253a99850a4248a1cb5a399f32467a
+%global commit fdb07323e0878e4773011a7a51a43a8900ad9d4a
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global date 20181027
+%global date 20181101
 
 Name:           ppsspp
-Version:        1.7.0
+Version:        1.7.1
 Release:        1%{?dist}
 Summary:        A PSP emulator
 License:        BSD and GPLv2+
@@ -20,7 +20,7 @@ URL:            https://www.ppsspp.org/
 ## which are not included in the source code:
 ##
 # git clone https://github.com/hrydgard/ppsspp.git
-# git checkout caa506bf2a253a99850a4248a1cb5a399f32467a
+# git checkout fdb07323e0878e4773011a7a51a43a8900ad9d4a
 # git submodule update --init ext/armips
 # git submodule update --init ext/glslang
 # git submodule update --init ext/SPIRV-Cross
@@ -35,6 +35,9 @@ Source2:        %{name}.appdata.xml
 # Fix version
 Patch0:         %{name}-1.1.0-git-version.patch
 Patch1:         %{name}-armv7.patch
+
+# https://github.com/hrydgard/ppsspp/pull/11507
+Patch2:         %{name}-1.7.0-upstream_bug11507.patch
 
 BuildRequires:  mesa-libEGL-devel
 BuildRequires:  mesa-libGLES-devel
@@ -94,10 +97,10 @@ export LDFLAGS="%{__global_ldflags} -lGL -fPIC"
  -DCMAKE_VERBOSE_MAKEFILE:BOOL=TRUE \
  -DUSE_FFMPEG:BOOL=ON -DUSE_SYSTEM_FFMPEG:BOOL=ON \
  -DUSE_SYSTEM_LIBZIP:BOOL=ON -DUSE_WAYLAND_WSI:BOOL=ON \
- -DUSING_EGL:BOOL=ON -DUSING_GLES2:BOOL=OFF -DUSING_X11_VULKAN=ON \
+ -DUSING_EGL:BOOL=ON -DUSING_GLES2:BOOL=ON -DUSING_X11_VULKAN=ON \
  -DUSING_QT_UI:BOOL=ON -DENABLE_GLSLANG_BINARIES:BOOL=OFF \
  -DLIBRETRO:BOOL=ON -DENABLE_HLSL:BOOL=OFF \
- -DOPENGL_xmesa_INCLUDE_DIR:PATH="%{_includedir}/GL -I%{_includedir}/GLES2"\
+ -DOPENGL_xmesa_INCLUDE_DIR:PATH="%{_includedir}/GL -I%{_includedir}/GLES2" \
  -DHEADLESS=OFF -DZLIB_INCLUDE_DIR:PATH=%{_includedir} \
 %ifarch %{ix86}
  -DX86:BOOL=ON \
@@ -165,9 +168,15 @@ appstream-util validate-relax --nonet %{buildroot}%{_metainfodir}/*.appdata.xml
 
 
 %changelog
+* Fri Nov 02 2018 Antonio Trande <sagitter@fedoraproject.org> - 1.7.1-1
+- Release 1.7.1
+- Enable USING_GLES2 option
+
+* Sun Oct 28 2018 Antonio Trande <sagitter@fedoraproject.org> - 1.7.0-2
+- Patched for upstream bug 11507
+
 * Sat Oct 27 2018 Antonio Trande <sagitter@fedoraproject.org> - 1.7.0-1
 - Release 1.7.0
-- Enable GLES2 option
 
 * Wed Sep 12 2018 Antonio Trande <sagitter@fedoraproject.org> - 1.6.3-4.20180912git6d0ed4a
 - Enable USE_WAYLAND_WSI
