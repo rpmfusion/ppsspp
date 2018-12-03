@@ -4,23 +4,23 @@ ExcludeArch: %{power64}
 # -Wl,--as-needed breaks linking on fedora 30+ 
 %undefine _ld_as_needed
 
-%global commit fdb07323e0878e4773011a7a51a43a8900ad9d4a
+%global commit 04b4dedfcacca4edef2d71d53eb2eb94568382e1
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global date 20181101
+%global date 20181123
 
 Name:           ppsspp
-Version:        1.7.1
+Version:        1.7.4
 Release:        1%{?dist}
 Summary:        A PSP emulator
 License:        BSD and GPLv2+
 URL:            https://www.ppsspp.org/
 
-## This commit coincides with the commit of release 1.7.0
+## This commit coincides with the commit of release 1.7.4
 ## We need to checkout it, then download relative submodules
 ## which are not included in the source code:
 ##
 # git clone https://github.com/hrydgard/ppsspp.git
-# git checkout fdb07323e0878e4773011a7a51a43a8900ad9d4a
+# git checkout %%{commit}
 # git submodule update --init ext/armips
 # git submodule update --init ext/glslang
 # git submodule update --init ext/SPIRV-Cross
@@ -151,6 +151,20 @@ mkdir -p %{buildroot}%{_metainfodir}
 install -pm 644 %SOURCE2 %{buildroot}%{_metainfodir}/
 appstream-util validate-relax --nonet %{buildroot}%{_metainfodir}/*.appdata.xml
 
+%if 0%{?rhel}
+%post
+/bin/touch --no-create %{_datadir}/icons/%{name} &>/dev/null || :
+
+%postun
+if [ $1 -eq 0 ] ; then
+    /bin/touch --no-create %{_datadir}/icons/%{name} &>/dev/null
+    /usr/bin/gtk-update-icon-cache %{_datadir}/icons/%{name} &>/dev/null || :
+fi
+
+%posttrans
+/usr/bin/gtk-update-icon-cache %{_datadir}/icons/%{name} &>/dev/null || :
+%endif
+
 
 %files
 %{_bindir}/PPSSPPQt
@@ -168,6 +182,9 @@ appstream-util validate-relax --nonet %{buildroot}%{_metainfodir}/*.appdata.xml
 
 
 %changelog
+* Mon Dec 03 2018 Antonio Trande <sagitter@fedoraproject.org> - 1.7.4-1
+- Release 1.7.4
+
 * Fri Nov 02 2018 Antonio Trande <sagitter@fedoraproject.org> - 1.7.1-1
 - Release 1.7.1
 - Enable USING_GLES2 option
