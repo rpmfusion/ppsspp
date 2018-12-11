@@ -4,12 +4,12 @@ ExcludeArch: %{power64}
 # -Wl,--as-needed breaks linking on fedora 30+ 
 %undefine _ld_as_needed
 
-%global commit 04b4dedfcacca4edef2d71d53eb2eb94568382e1
+%global commit 74d87fa2b4a3c943c1df09cc26a8c70b1335fd30
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global date 20181123
+%global date 20181204
 
 Name:           ppsspp
-Version:        1.7.4
+Version:        1.7.5
 Release:        1%{?dist}
 Summary:        A PSP emulator
 License:        BSD and GPLv2+
@@ -182,6 +182,9 @@ fi
 
 
 %changelog
+* Tue Dec 11 2018 Antonio Trande <sagitter@fedoraproject.org> - 1.7.5-1
+- Release 1.7.5
+
 * Mon Dec 03 2018 Antonio Trande <sagitter@fedoraproject.org> - 1.7.4-1
 - Release 1.7.4
 
