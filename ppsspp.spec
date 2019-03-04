@@ -10,7 +10,7 @@ ExcludeArch: %{power64}
 
 Name:           ppsspp
 Version:        1.7.5
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        A PSP emulator
 License:        BSD and GPLv2+
 URL:            https://www.ppsspp.org/
@@ -182,6 +182,9 @@ fi
 
 
 %changelog
+* Mon Mar 04 2019 RPM Fusion Release Engineering <leigh123linux@gmail.com> - 1.7.5-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_30_Mass_Rebuild
+
 * Tue Dec 11 2018 Antonio Trande <sagitter@fedoraproject.org> - 1.7.5-1
 - Release 1.7.5
 
