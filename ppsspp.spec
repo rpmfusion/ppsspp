@@ -4,18 +4,18 @@ ExcludeArch: %{power64}
 # -Wl,--as-needed breaks linking on fedora 30+ 
 %undefine _ld_as_needed
 
-%global commit 74d87fa2b4a3c943c1df09cc26a8c70b1335fd30
+%global commit e66f019ffaaf7ff4224aa3605ebf59f5654bd0d4
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global date 20181204
+%global date 20190314
 
 Name:           ppsspp
-Version:        1.7.5
-Release:        2%{?dist}
+Version:        1.8.0
+Release:        1%{?dist}
 Summary:        A PSP emulator
 License:        BSD and GPLv2+
 URL:            https://www.ppsspp.org/
 
-## This commit coincides with the commit of release 1.7.4
+## This commit coincides with the commit of release %%{version}.
 ## We need to checkout it, then download relative submodules
 ## which are not included in the source code:
 ##
@@ -25,6 +25,9 @@ URL:            https://www.ppsspp.org/
 # git submodule update --init ext/glslang
 # git submodule update --init ext/SPIRV-Cross
 # git submodule update --init ext/discord-rpc
+# git clone https://github.com/hrydgard/ppsspp-lang
+# rm -rf ppsspp-lang/.git
+# cd ..
 # rm -rf ppsspp/.git ppsspp/.gitignore
 # tar -czvf ppsspp-%%{version}.tar.gz ppsspp
 ##
@@ -34,10 +37,6 @@ Source2:        %{name}.appdata.xml
 
 # Fix version
 Patch0:         %{name}-1.1.0-git-version.patch
-Patch1:         %{name}-armv7.patch
-
-# https://github.com/hrydgard/ppsspp/pull/11507
-Patch2:         %{name}-1.7.0-upstream_bug11507.patch
 
 BuildRequires:  mesa-libEGL-devel
 BuildRequires:  mesa-libGLES-devel
@@ -130,7 +129,9 @@ chrpath -r %{_libdir}/%{name} %{buildroot}%{_bindir}/PPSSPPQt
 # Install data files
 mkdir -p %{buildroot}%{_datadir}/%{name}
 cp -a ./assets %{buildroot}%{_datadir}/%{name}/
-install -pm 644 Qt/languages/* %{buildroot}%{_datadir}/%{name}/assets/lang/
+install -pm 644 ppsspp-lang/*.ini %{buildroot}%{_datadir}/%{name}/assets/lang/
+install -pm 644 korean.txt %{buildroot}%{_datadir}/%{name}/assets/lang/korean.ini
+install -pm 644 chinese.txt %{buildroot}%{_datadir}/%{name}/assets/lang/chinese.ini
 
 # Remove unnecessary files
 rm -rf %{buildroot}%{_includedir}
@@ -182,6 +183,11 @@ fi
 
 
 %changelog
+* Thu Mar 14 2019 Antonio Trande <sagitter@fedoraproject.org> - 1.8.0-1
+- Release 1.8.0
+- Install language .ini files
+- Modify screenshot's links of the appdata file
+
 * Mon Mar 04 2019 RPM Fusion Release Engineering <leigh123linux@gmail.com> - 1.7.5-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_30_Mass_Rebuild
 

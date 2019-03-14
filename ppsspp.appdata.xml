@@ -25,10 +25,16 @@
   <url type="homepage">https://www.ppsspp.org//</url>
   <screenshots>
     <screenshot type="default">
-     <image>https://sagitter.fedorapeople.org/ppsspp/ppsspp1.png</image>
+     <image>https://www.ppsspp.org/img/screens/Ace_Combat_X2_Joint_Assault_-_Abbanon.jpg</image>
     </screenshot>
     <screenshot>
-     <image>https://sagitter.fedorapeople.org/ppsspp/ppsspp2.png</image>
+     <image>https://www.ppsspp.org/img/screens/Armored_Core_Silent_Line_-_Abbanon.jpg</image>
+    </screenshot>
+    <screenshot>
+     <image>https://www.ppsspp.org/img/screens/Assassins_Creed_Bloodlines_-_A_Yuanda.jpg</image>
+    </screenshot>
+    <screenshot>
+     <image>https://www.ppsspp.org/img/screens/Metal_Gear_Solid_Peace_Walker_-_A_Yunada.jpg</image>
     </screenshot>
   </screenshots>
   <updatecontact>sagitter_at_fedoraproject.org</updatecontact>
