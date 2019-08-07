@@ -10,7 +10,7 @@ ExcludeArch: %{power64}
 
 Name:           ppsspp
 Version:        1.8.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        A PSP emulator
 License:        BSD and GPLv2+
 URL:            https://www.ppsspp.org/
@@ -183,6 +183,9 @@ fi
 
 
 %changelog
+* Wed Aug 07 2019 Leigh Scott <leigh123linux@gmail.com> - 1.8.0-2
+- Rebuild for new ffmpeg version
+
 * Thu Mar 14 2019 Antonio Trande <sagitter@fedoraproject.org> - 1.8.0-1
 - Release 1.8.0
 - Install language .ini files
