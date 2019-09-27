@@ -4,13 +4,13 @@ ExcludeArch: %{power64}
 # -Wl,--as-needed breaks linking on fedora 30+ 
 %undefine _ld_as_needed
 
-%global commit e66f019ffaaf7ff4224aa3605ebf59f5654bd0d4
+%global commit 4f07db87d8b8e9386c59fd7384f433e5fd137ded
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global date 20190314
+%global date 20190925
 
 Name:           ppsspp
-Version:        1.8.0
-Release:        2%{?dist}
+Version:        1.9.0
+Release:        1%{?dist}
 Summary:        A PSP emulator
 License:        BSD and GPLv2+
 URL:            https://www.ppsspp.org/
@@ -183,6 +183,9 @@ fi
 
 
 %changelog
+* Thu Sep 26 2019 Antonio Trande <sagitter@fedoraproject.org> - 1.9.0-1
+- Release 1.9.0
+
 * Wed Aug 07 2019 Leigh Scott <leigh123linux@gmail.com> - 1.8.0-2
 - Rebuild for new ffmpeg version
 
