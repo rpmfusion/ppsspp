@@ -73,7 +73,7 @@ Data files of %{name}.
 
 
 %prep
-%autosetup -n %{name} -p1
+%autosetup -n %{name}-%{version} -p1
 
 # Set version
 sed -e 's|@@unknown_version@@|%{version}|g' -i git-version.cmake
