@@ -4,9 +4,9 @@ ExcludeArch: %{power64}
 # -Wl,--as-needed breaks linking on fedora 30+ 
 %undefine _ld_as_needed
 
-%global commit 4f07db87d8b8e9386c59fd7384f433e5fd137ded
+%global commit e3c9793cb3a68ec9f44371c7ebb45a0abed1ecca
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global date 20190925
+%global date 20191016
 
 Name:           ppsspp
 Version:        1.9.4
@@ -20,7 +20,7 @@ URL:            https://www.ppsspp.org/
 ## which are not included in the source code:
 ##
 # git clone https://github.com/hrydgard/ppsspp.git
-# git checkout %%{commit}
+# cd ppsspp && git checkout %%{commit}
 # git submodule update --init ext/armips
 # git submodule update --init ext/glslang
 # git submodule update --init ext/SPIRV-Cross
@@ -73,7 +73,7 @@ Data files of %{name}.
 
 
 %prep
-%autosetup -n %{name}-%{version} -p1
+%autosetup -n %{name} -p1
 
 # Set version
 sed -e 's|@@unknown_version@@|%{version}|g' -i git-version.cmake
