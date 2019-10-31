@@ -9,7 +9,7 @@ ExcludeArch: %{power64}
 %global date 20190925
 
 Name:           ppsspp
-Version:        1.9.0
+Version:        1.9.4
 Release:        1%{?dist}
 Summary:        A PSP emulator
 License:        BSD and GPLv2+
@@ -183,6 +183,9 @@ fi
 
 
 %changelog
+* Thu Oct 31 2019 Antonio Trande <sagitter@fedoraproject.org> - 1.9.4-1
+- Release 1.9.4
+
 * Thu Sep 26 2019 Antonio Trande <sagitter@fedoraproject.org> - 1.9.0-1
 - Release 1.9.0
 
