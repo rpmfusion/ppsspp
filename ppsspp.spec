@@ -8,9 +8,19 @@ ExcludeArch: %{power64}
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
 %global date 20191016
 
+%bcond_with debug
+
+# Note:
+# SDL version works disabling EGL support.
+# Qt version works disabling both EGL and GLES2 support.
+%bcond_without qt
+
+# EGL/GLES2 support.
+%bcond_with egles2
+
 Name:           ppsspp
 Version:        1.9.4
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        A PSP emulator
 License:        BSD and GPLv2+
 URL:            https://www.ppsspp.org/
@@ -38,8 +48,10 @@ Source2:        %{name}.appdata.xml
 # Fix version
 Patch0:         %{name}-1.1.0-git-version.patch
 
+%if %{with egles2}
 BuildRequires:  mesa-libEGL-devel
 BuildRequires:  mesa-libGLES-devel
+%endif
 BuildRequires:  cmake3
 BuildRequires:  chrpath
 BuildRequires:  desktop-file-utils
@@ -49,11 +61,14 @@ BuildRequires:  snappy-devel
 BuildRequires:  SDL2-devel
 BuildRequires:  gcc, gcc-c++
 BuildRequires:  libzip-devel
+BuildRequires:  libpng-devel
 BuildRequires:  zlib-devel
 BuildRequires:  glew-devel
 BuildRequires:  libGL-devel
+%if %{with qt}
 BuildRequires:  qt5-qtbase-devel
 BuildRequires:  qt5-qttools-devel
+%endif
 BuildRequires:  libappstream-glib
 BuildRequires:  rapidjson-devel
 
@@ -75,32 +90,64 @@ Data files of %{name}.
 %prep
 %autosetup -n %{name} -p1
 
+# Remove bundled libzip libraries
+rm -rf /ext/native/ext/libzip
+
 # Set version
 sed -e 's|@@unknown_version@@|%{version}|g' -i git-version.cmake
 
 # Remove unrecognized flag
-sed -i.bak '/Wno-deprecated-register/d' CMakeLists.txt
+sed -i.bak '/-Wno-deprecated-register/d' CMakeLists.txt
 
-# Downgrade optimization level to the default one for fedora
-sed -e 's| -O3 | -O2 |g' -i CMakeLists.txt
+# Downgrade optimization level
+%if %{with debug}
+sed -e 's| -O3 | -O0 |g' -i CMakeLists.txt ext/SPIRV-Cross/Makefile Tools/pauth_tool/Makefile ext/armips/ext/tinyformat/Makefile
+sed -e 's| -O2 | -O0 |g' -i CMakeLists.txt ext/SPIRV-Cross/Makefile Tools/pauth_tool/Makefile ext/armips/ext/tinyformat/Makefile
+sed -e 's| -D_NDEBUG | -DDEBUG |g' -i CMakeLists.txt libretro/Makefile ext/SPIRV-Cross/Makefile
+sed -e 's| -DNDEBUG | -DDEBUG |g' -i ext/SPIRV-Cross/Makefile
+%else
+sed -e 's| -O3 | -O2 |g' -i CMakeLists.txt ext/SPIRV-Cross/Makefile Tools/pauth_tool/Makefile ext/armips/ext/tinyformat/Makefile
+%endif
 
 ## Remove spurious executable permissions
 find ext Core -perm /755 -type f \( -name "*.cpp" -o -name "*.h" -o -name "*.hpp" -o -name "*.y" \) -exec  chmod -x {} ';'
 
 
 %build
+mkdir build && pushd build
+
 export LDFLAGS="%{__global_ldflags} -lGL -fPIC"
+export CC=gcc
+export CXX=g++
+
+%if %{with debug}
+export CXXFLAGS="-O0 -g -fPIC"
+export CFLAGS="-O0 -g -fPIC"
+%cmake3 -DCMAKE_BUILD_TYPE:STRING=RelWithDebInfo -DCMAKE_C_FLAGS_RELWITHDEBINFO:STRING="-O0 -g -DDEBUG" -DCMAKE_CXX_FLAGS_RELWITHDEBINFO:STRING="-O0 -g -DDEBUG" \
+%else
 %cmake3 -DCMAKE_BUILD_TYPE:STRING=Release \
+%endif
  -DCMAKE_INSTALL_LIBDIR:PATH=%{_lib}/%{name} \
  -Wno-dev -DARMIPS_REGEXP:BOOL=OFF \
  -DCMAKE_VERBOSE_MAKEFILE:BOOL=TRUE \
  -DUSE_FFMPEG:BOOL=ON -DUSE_SYSTEM_FFMPEG:BOOL=ON \
  -DUSE_SYSTEM_LIBZIP:BOOL=ON -DUSE_WAYLAND_WSI:BOOL=ON \
- -DUSING_EGL:BOOL=ON -DUSING_GLES2:BOOL=ON -DUSING_X11_VULKAN=ON \
- -DUSING_QT_UI:BOOL=ON -DENABLE_GLSLANG_BINARIES:BOOL=OFF \
+%if %{with egles2}
+ -DUSING_EGL:BOOL=OFF -DUSING_GLES2:BOOL=OFF \
+ -DOPENGL_EGL_INCLUDE_DIR:PATH="%{_includedir}/EGL -I%{_includedir}/GLES2" \
+%endif
+ -DUSING_X11_VULKAN=ON \
+ -DENABLE_GLSLANG_BINARIES:BOOL=OFF \
  -DLIBRETRO:BOOL=ON -DENABLE_HLSL:BOOL=OFF \
- -DOPENGL_xmesa_INCLUDE_DIR:PATH="%{_includedir}/GL -I%{_includedir}/GLES2" \
+ -DOPENGL_xmesa_INCLUDE_DIR:PATH="%{_includedir}/GL" \
  -DHEADLESS=OFF -DZLIB_INCLUDE_DIR:PATH=%{_includedir} \
+%if %{with qt}
+ -DUSING_QT_UI:BOOL=ON \
+ -DPNG_PNG_INCLUDE_DIR:PATH=%{_includedir}/libpng16 -DPNG_LIBRARY:FILEPATH=%{_libdir}/libpng.so \
+%else
+ -DUSING_QT_UI:BOOL=OFF \
+ -DPNG_PNG_INCLUDE_DIR:PATH=../ext/native/ext/libpng17 \
+%endif
 %ifarch %{ix86}
  -DX86:BOOL=ON \
 %endif
@@ -113,22 +160,29 @@ export LDFLAGS="%{__global_ldflags} -lGL -fPIC"
 %ifarch x86_64
  -DX86_64:BOOL=ON \
 %endif
- -DBUILD_TESTING:BOOL=OFF
+ -DBUILD_TESTING:BOOL=OFF ..
+
 %make_build V=1
 
+popd
 
 %install
-%make_install
+%make_install -C build
 
 # Install PPSSPP executable
-install -Dpm 755 ./PPSSPPQt %{buildroot}%{_bindir}/PPSSPPQt
+%if %{with qt}
+install -Dpm 755 build/PPSSPPQt %{buildroot}%{_bindir}/PPSSPPQt
+%else
+install -Dpm 755 build/PPSSPPSDL %{buildroot}%{_bindir}/PPSSPPSDL
+%endif
 
 # Set rpath
-chrpath -r %{_libdir}/%{name} %{buildroot}%{_bindir}/PPSSPPQt
+chrpath -r %{_libdir}/%{name} %{buildroot}%{_bindir}/PPSSPP*
 
 # Install data files
 mkdir -p %{buildroot}%{_datadir}/%{name}
-cp -a ./assets %{buildroot}%{_datadir}/%{name}/
+cp -a build/assets %{buildroot}%{_datadir}/%{name}/
+
 install -pm 644 ppsspp-lang/*.ini %{buildroot}%{_datadir}/%{name}/assets/lang/
 install -pm 644 korean.txt %{buildroot}%{_datadir}/%{name}/assets/lang/korean.ini
 install -pm 644 chinese.txt %{buildroot}%{_datadir}/%{name}/assets/lang/chinese.ini
@@ -137,15 +191,16 @@ install -pm 644 chinese.txt %{buildroot}%{_datadir}/%{name}/assets/lang/chinese.
 rm -rf %{buildroot}%{_includedir}
 
 # Install icons
-mkdir -p %{buildroot}%{_datadir}/icons
-cp -a icons/hicolor %{buildroot}%{_datadir}/icons/
-
 mkdir -p %{buildroot}%{_datadir}/icons/%{name}
+cp -a icons/hicolor %{buildroot}%{_datadir}/icons/
 install -pm 644 icons/icon-114.png %{buildroot}%{_datadir}/icons/%{name}/%{name}.png
 
 # Install desktop file
 mkdir -p %{buildroot}%{_datadir}/applications
 desktop-file-install -m 644 %SOURCE1 --dir=%{buildroot}%{_datadir}/applications
+%if %{with qt}
+desktop-file-edit --set-key=Exec --set-value=%{_bindir}/PPSSPPQt %{buildroot}%{_datadir}/applications/ppsspp.desktop
+%endif
 
 # Install appdata file
 mkdir -p %{buildroot}%{_metainfodir}
@@ -168,7 +223,7 @@ fi
 
 
 %files
-%{_bindir}/PPSSPPQt
+%{_bindir}/PPSSPP*
 %{_datadir}/icons/hicolor/*/apps/%{name}.png
 %{_datadir}/icons/%{name}/
 %{_datadir}/applications/%{name}.desktop
@@ -183,6 +238,9 @@ fi
 
 
 %changelog
+* Wed Nov 06 2019 Antonio Trande <sagitter@fedoraproject.org> - 1.9.4-2
+- Unset EGL/GLES support
+
 * Thu Oct 31 2019 Antonio Trande <sagitter@fedoraproject.org> - 1.9.4-1
 - Release 1.9.4
 
