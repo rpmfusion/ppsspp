@@ -20,7 +20,7 @@ ExcludeArch: %{power64}
 
 Name:           ppsspp
 Version:        1.9.4
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        A PSP emulator
 License:        BSD and GPLv2+
 URL:            https://www.ppsspp.org/
@@ -238,6 +238,9 @@ fi
 
 
 %changelog
+* Wed Feb 05 2020 RPM Fusion Release Engineering <leigh123linux@gmail.com> - 1.9.4-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
+
 * Wed Nov 06 2019 Antonio Trande <sagitter@fedoraproject.org> - 1.9.4-2
 - Unset EGL/GLES support
 
