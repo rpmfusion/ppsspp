@@ -20,7 +20,7 @@ ExcludeArch: %{power64}
 
 Name:           ppsspp
 Version:        1.9.4
-Release:        3%{?dist}
+Release:        2%{?dist}
 Summary:        A PSP emulator
 License:        BSD and GPLv2+
 URL:            https://www.ppsspp.org/
@@ -47,6 +47,9 @@ Source2:        %{name}.appdata.xml
 
 # Fix version
 Patch0:         %{name}-1.1.0-git-version.patch
+
+# https://github.com/hrydgard/ppsspp/pull/12593
+Patch1:         %{name}-bug12593.patch
 
 %if %{with egles2}
 BuildRequires:  mesa-libEGL-devel
@@ -238,8 +241,9 @@ fi
 
 
 %changelog
-* Wed Feb 05 2020 RPM Fusion Release Engineering <leigh123linux@gmail.com> - 1.9.4-3
+* Wed Feb 19 2020 Antonio Trande <sagitter@fedoraproject.org> - 1.9.4-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
+- Patched for GCC-10
 
 * Wed Nov 06 2019 Antonio Trande <sagitter@fedoraproject.org> - 1.9.4-2
 - Unset EGL/GLES support
