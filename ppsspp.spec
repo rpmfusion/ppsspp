@@ -20,7 +20,7 @@ ExcludeArch: %{power64}
 
 Name:           ppsspp
 Version:        1.9.4
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        A PSP emulator
 License:        BSD and GPLv2+
 URL:            https://www.ppsspp.org/
@@ -241,6 +241,9 @@ fi
 
 
 %changelog
+* Sat Feb 22 2020 RPM Fusion Release Engineering <leigh123linux@googlemail.com> - 1.9.4-4
+- Rebuild for ffmpeg-4.3 git
+
 * Wed Feb 19 2020 Antonio Trande <sagitter@fedoraproject.org> - 1.9.4-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
 - Patched for GCC-10
