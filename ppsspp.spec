@@ -245,6 +245,9 @@ fi
 * Sat Jun 27 2020 Antonio Trande <sagitter@fedoraproject.org> - 1.10.0-1
 - Release 1.10.0
 
+* Sat Feb 22 2020 RPM Fusion Release Engineering <leigh123linux@googlemail.com> - 1.9.4-4
+- Rebuild for ffmpeg-4.3 git
+
 * Wed Feb 19 2020 Antonio Trande <sagitter@fedoraproject.org> - 1.9.4-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
 - Patched for GCC-10
