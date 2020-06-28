@@ -4,9 +4,9 @@ ExcludeArch: %{power64}
 # -Wl,--as-needed breaks linking on fedora 30+ 
 %undefine _ld_as_needed
 
-%global commit e3c9793cb3a68ec9f44371c7ebb45a0abed1ecca
+%global commit 401df203844465b84015d4710c6f02914b890589
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global date 20191016
+%global date 20200627
 
 %bcond_with debug
 
@@ -19,8 +19,8 @@ ExcludeArch: %{power64}
 %bcond_with egles2
 
 Name:           ppsspp
-Version:        1.9.4
-Release:        4%{?dist}
+Version:        1.10.0
+Release:        1%{?dist}
 Summary:        A PSP emulator
 License:        BSD and GPLv2+
 URL:            https://www.ppsspp.org/
@@ -46,10 +46,10 @@ Source1:        %{name}.desktop
 Source2:        %{name}.appdata.xml
 
 # Fix version
-Patch0:         %{name}-1.1.0-git-version.patch
+Patch0: %{name}-1.1.0-git-version.patch
+Patch1: %{name}-1.10.0-remove_unrecognized_flag.patch
 
-# https://github.com/hrydgard/ppsspp/pull/12593
-Patch1:         %{name}-bug12593.patch
+Patch2: %{name}-1.10.0-bug13058.patch
 
 %if %{with egles2}
 BuildRequires:  mesa-libEGL-devel
@@ -71,6 +71,7 @@ BuildRequires:  libGL-devel
 %if %{with qt}
 BuildRequires:  qt5-qtbase-devel
 BuildRequires:  qt5-qttools-devel
+BuildRequires:  qt5-qtmultimedia-devel
 %endif
 BuildRequires:  libappstream-glib
 BuildRequires:  rapidjson-devel
@@ -136,7 +137,7 @@ export CFLAGS="-O0 -g -fPIC"
  -DUSE_FFMPEG:BOOL=ON -DUSE_SYSTEM_FFMPEG:BOOL=ON \
  -DUSE_SYSTEM_LIBZIP:BOOL=ON -DUSE_WAYLAND_WSI:BOOL=ON \
 %if %{with egles2}
- -DUSING_EGL:BOOL=OFF -DUSING_GLES2:BOOL=OFF \
+ -DUSING_EGL:BOOL=ON -DUSING_GLES2:BOOL=ON \
  -DOPENGL_EGL_INCLUDE_DIR:PATH="%{_includedir}/EGL -I%{_includedir}/GLES2" \
 %endif
  -DUSING_X11_VULKAN=ON \
@@ -241,6 +242,9 @@ fi
 
 
 %changelog
+* Sat Jun 27 2020 Antonio Trande <sagitter@fedoraproject.org> - 1.10.0-1
+- Release 1.10.0
+
 * Sat Feb 22 2020 RPM Fusion Release Engineering <leigh123linux@googlemail.com> - 1.9.4-4
 - Rebuild for ffmpeg-4.3 git
 
