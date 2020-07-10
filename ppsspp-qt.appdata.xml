@@ -12,7 +12,7 @@
   </categories>
   <description>
     <p>
-       PPSSPP - a fast and portable PSP emulator.
+       PPSSPP - a fast and portable PSP emulator with Qt5 frontend wrapper.
     </p>  
   </description>
   <releases>
