@@ -2,11 +2,11 @@
 Version=1.0
 Type=Application
 Terminal=false
-Name=PPSSPP
-Exec=/usr/bin/PPSSPPSDL
+Name=PPSSPP Qt
+Exec=/usr/bin/PPSSPPQt
 Icon=/usr/share/icons/ppsspp/ppsspp.png
 X-Window-Icon=
 X-HildonDesk-ShowInToolbar=true
 X-Osso-Type=application/x-executable
-Name[en_US]=PPSSPP
+Name[en_US]=PPSSPP Qt
 Categories=Game;Simulation;
