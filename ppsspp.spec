@@ -14,11 +14,6 @@ ExcludeArch: %{power64}
 
 %bcond_with debug
 
-# Note:
-# SDL version with EGL/GLES2 and libretro support: Ok on X11. Ok on Wayland.
-# Qt version with EGL and without GLES2 support: Ok on X11, bad sound. Crashed on Wayland.
-# Qt version without EGL/GLES2 support: Ok on X11, bad sound. Crashed on Wayland. 
-
 %global common_build_options \\\
  -DCMAKE_INSTALL_LIBDIR:PATH=%{_lib}/%{name} \\\
  -DPYTHON_EXECUTABLE:FILEPATH=%{__python3} \\\
@@ -43,13 +38,12 @@ ExcludeArch: %{power64}
  -DENABLE_GLSLANG_BINARIES:BOOL=OFF \\\
  -DENABLE_HLSL:BOOL=OFF \\\
  -DOPENGL_xmesa_INCLUDE_DIR:PATH= \\\
- -DHEADLESS=OFF -DZLIB_INCLUDE_DIR:PATH=%{_includedir} \\\
- -DPNG_PNG_INCLUDE_DIR:PATH=%{_includedir}/libpng16 -DPNG_LIBRARY:FILEPATH=%{_libdir}/libpng.so
+ -DHEADLESS=OFF -DZLIB_INCLUDE_DIR:PATH=%{_includedir}
  
  
 Name:           ppsspp
 Version:        1.10.2
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        A PSP emulator
 License:        BSD and GPLv2+
 URL:            https://www.ppsspp.org/
@@ -75,6 +69,8 @@ Source1:        %{name}.desktop
 Source2:        %{name}.appdata.xml
 Source3:        %{name}-qt.desktop
 Source4:        %{name}-qt.appdata.xml
+
+# See https://github.com/hrydgard/ppsspp/issues/13119
 Source5:        %{name}-qt-wayland.desktop
 
 # Fix version
@@ -83,7 +79,11 @@ Patch1: %{name}-1.10.0-remove_unrecognized_flag.patch
 
 BuildRequires:  pkgconfig(egl)
 BuildRequires:  pkgconfig(glesv2)
-BuildRequires:  pkgconfig(opengl)
+%{?fedora:BuildRequires:  pkgconfig(opengl)}
+%{?fedora:BuildRequires:  pkgconfig(libpng)}
+%{?el7:BuildRequires: libglvnd-devel}
+%{?el7:BuildRequires: pkgconfig(libpng)}
+%{?el8:BuildRequires: pkgconfig(libpng16)}
 BuildRequires:  pkgconfig(glew)
 BuildRequires:  cmake3
 BuildRequires:  python%{python3_pkgversion}-devel
@@ -97,7 +97,6 @@ BuildRequires:  SDL2-devel
 BuildRequires:  %{?dts}gcc, %{?dts}gcc-c++
 BuildRequires:  libzip-devel
 BuildRequires:  snappy-devel
-BuildRequires:  libpng-devel
 BuildRequires:  zlib-devel
 BuildRequires:  qt5-qtbase-devel
 BuildRequires:  qt5-qttools-devel
@@ -312,6 +311,9 @@ fi
 %{_datadir}/icons/%{name}/
 
 %changelog
+* Fri Jul 10 2020 Antonio Trande <sagitter@fedoraproject.org> - 1.10.2-2
+- Fix EPEL7 builds
+
 * Fri Jul 10 2020 Antonio Trande <sagitter@fedoraproject.org> - 1.10.2-1
 - Release 1.10.2
 - Create a Qt and a SDL version
