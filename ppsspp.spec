@@ -43,7 +43,7 @@ ExcludeArch: %{power64}
  
 Name:           ppsspp
 Version:        1.10.2
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        A PSP emulator
 License:        BSD and GPLv2+
 URL:            https://www.ppsspp.org/
@@ -79,8 +79,13 @@ Patch1: %{name}-1.10.0-remove_unrecognized_flag.patch
 
 BuildRequires:  pkgconfig(egl)
 BuildRequires:  pkgconfig(glesv2)
-%{?fedora:BuildRequires:  pkgconfig(opengl)}
-%{?fedora:BuildRequires:  pkgconfig(libpng)}
+%if 0%{?fedora} && 0%{?fedora} > 31
+BuildRequires: pkgconfig(opengl)
+%endif
+%if 0%{?fedora} && 0%{?fedora} < 32
+BuildRequires: pkgconfig(libglvnd)
+%endif
+%{?fedora:BuildRequires: pkgconfig(libpng)}
 %{?el7:BuildRequires: libglvnd-devel}
 %{?el7:BuildRequires: pkgconfig(libpng)}
 %{?el8:BuildRequires: pkgconfig(libpng16)}
@@ -311,6 +316,9 @@ fi
 %{_datadir}/icons/%{name}/
 
 %changelog
+* Sat Jul 11 2020 Antonio Trande <sagitter@fedoraproject.org> - 1.10.2-3
+- Fix Fedora 31 builds
+
 * Fri Jul 10 2020 Antonio Trande <sagitter@fedoraproject.org> - 1.10.2-2
 - Fix EPEL7 builds
 
