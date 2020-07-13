@@ -8,9 +8,9 @@ ExcludeArch: %{power64}
 # -Wl,--as-needed breaks linking on fedora 30+ 
 %undefine _ld_as_needed
 
-%global commit 9ec2c2baff0894d2b998254d52389d253d1dd386
+%global commit 087de849bdc74205dd00d8e6e11ba17a591213ab
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global date 20200707
+%global date 20200712
 
 %bcond_with debug
 
@@ -42,8 +42,8 @@ ExcludeArch: %{power64}
  
  
 Name:           ppsspp
-Version:        1.10.2
-Release:        3%{?dist}
+Version:        1.10.3
+Release:        1%{?dist}
 Summary:        A PSP emulator
 License:        BSD and GPLv2+
 URL:            https://www.ppsspp.org/
@@ -316,6 +316,9 @@ fi
 %{_datadir}/icons/%{name}/
 
 %changelog
+* Mon Jul 13 2020 Antonio Trande <sagitter@fedoraproject.org> - 1.10.3-1
+- Release 1.10.3
+
 * Sat Jul 11 2020 Antonio Trande <sagitter@fedoraproject.org> - 1.10.2-3
 - Fix Fedora 31 builds
 
