@@ -130,7 +130,7 @@ Summary: PPSSPP with SDL frontend
 Requires: %{name}-data = %{version}-%{release}
 Requires: %{name}-libs%{?_isa} = %{version}-%{release}
 Obsoletes: %{name} < 0:1.10.2
-Provides: %{name} >= 0:1.10.2
+Provides: %{name} = 0:%{version}-%{release}
 %description sdl
 PPSSPP with SDL frontend.
 
