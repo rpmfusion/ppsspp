@@ -43,7 +43,7 @@ ExcludeArch: %{power64}
  
 Name:           ppsspp
 Version:        1.10.3
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        A PSP emulator
 License:        BSD and GPLv2+
 URL:            https://www.ppsspp.org/
@@ -130,6 +130,7 @@ Summary: PPSSPP with SDL frontend
 Requires: %{name}-data = %{version}-%{release}
 Requires: %{name}-libs%{?_isa} = %{version}-%{release}
 Obsoletes: %{name} < 0:1.10.2
+Provides: %{name} = 0:%{version}-%{release}
 %description sdl
 PPSSPP with SDL frontend.
 
@@ -316,6 +317,9 @@ fi
 %{_datadir}/icons/%{name}/
 
 %changelog
+* Thu Jul 16 2020 Antonio Trande <sagitter@fedoraproject.org> - 1.10.3-2
+- ppsspp-sdl now provides original previous ppsspp rpm
+
 * Mon Jul 13 2020 Antonio Trande <sagitter@fedoraproject.org> - 1.10.3-1
 - Release 1.10.3
 
