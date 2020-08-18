@@ -1,6 +1,8 @@
 # https://github.com/hrydgard/ppsspp/issues/8823
 ExcludeArch: %{power64}
 
+%global __cmake_in_source_build 1
+
 %if 0%{?el7}
 %global dts devtoolset-9-
 %endif
