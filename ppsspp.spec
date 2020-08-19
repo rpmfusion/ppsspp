@@ -3,6 +3,11 @@ ExcludeArch: %{power64}
 
 %global __cmake_in_source_build 1
 
+# Disable LTO flags
+# ... during IPA pass: pure-const
+# lto1: internal compiler error: Segmentation fault
+%define _lto_cflags %{nil}
+
 %if 0%{?el7}
 %global dts devtoolset-9-
 %endif
@@ -319,8 +324,9 @@ fi
 %{_datadir}/icons/%{name}/
 
 %changelog
-* Tue Aug 18 2020 RPM Fusion Release Engineering <leigh123linux@gmail.com> - 1.10.3-3
+* Wed Aug 19 2020 Antonio Trande <sagitter@fedoraproject.org> - 1.10.3-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+- Disable LTO flags
 
 * Thu Jul 16 2020 Antonio Trande <sagitter@fedoraproject.org> - 1.10.3-2
 - ppsspp-sdl now provides original previous ppsspp rpm
