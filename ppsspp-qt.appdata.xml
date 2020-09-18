@@ -5,6 +5,7 @@
   <summary>A PSP emulator</summary>
   <name>PPSSPP</name>
   <project_license>GPL-2.0+ and BSD</project_license>
+  <icon type="local">/usr/share/icons/ppsspp/ppsspp.png</icon>
   <categories>
    <category>Games</category>
    <category>ActionGame</category>
