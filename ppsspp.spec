@@ -50,7 +50,7 @@ ExcludeArch: %{power64}
  
 Name:           ppsspp
 Version:        1.10.3
-Release:        4%{?dist}
+Release:        3%{?dist}
 Summary:        A PSP emulator
 License:        BSD and GPLv2+
 URL:            https://www.ppsspp.org/
@@ -324,9 +324,6 @@ fi
 %{_datadir}/icons/%{name}/
 
 %changelog
-* Fri Sep 18 2020 Antonio Trande <sagitter@fedoraproject.org> - 1.10.3-4
-- Add icon/ tag into appdata files
-
 * Wed Aug 19 2020 Antonio Trande <sagitter@fedoraproject.org> - 1.10.3-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
 - Disable LTO flags
