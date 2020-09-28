@@ -1,6 +1,13 @@
 # https://github.com/hrydgard/ppsspp/issues/8823
 ExcludeArch: %{power64}
 
+%global __cmake_in_source_build 1
+
+# Disable LTO flags
+# ... during IPA pass: pure-const
+# lto1: internal compiler error: Segmentation fault
+%define _lto_cflags %{nil}
+
 %if 0%{?el7}
 %global dts devtoolset-9-
 %endif
@@ -43,7 +50,7 @@ ExcludeArch: %{power64}
  
 Name:           ppsspp
 Version:        1.10.3
-Release:        2%{?dist}
+Release:        4%{?dist}
 Summary:        A PSP emulator
 License:        BSD and GPLv2+
 URL:            https://www.ppsspp.org/
@@ -317,6 +324,13 @@ fi
 %{_datadir}/icons/%{name}/
 
 %changelog
+* Sat Sep 19 2020 Leigh Scott <leigh123linux@gmail.com> - 1.10.3-4
+- Fix desktop files so appstream data is created
+
+* Wed Aug 19 2020 Antonio Trande <sagitter@fedoraproject.org> - 1.10.3-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+- Disable LTO flags
+
 * Thu Jul 16 2020 Antonio Trande <sagitter@fedoraproject.org> - 1.10.3-2
 - ppsspp-sdl now provides original previous ppsspp rpm
 
