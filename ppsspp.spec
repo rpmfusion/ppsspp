@@ -96,6 +96,7 @@ BuildRequires: pkgconfig(libglvnd)
 %{?el8:BuildRequires: pkgconfig(libpng16)}
 BuildRequires:  pkgconfig(glew)
 BuildRequires:  cmake3
+BuildRequires:  make
 BuildRequires:  python%{python3_pkgversion}-devel
 BuildRequires:  python%{python3_pkgversion}-setuptools
 BuildRequires:  chrpath
@@ -200,7 +201,7 @@ export CFLAGS="-O0 -g -fPIC"
  -DLIBRETRO:BOOL=OFF \
  -DUSING_QT_UI:BOOL=OFF \
  %{common_build_options}
-%make_build
+%make_build -C build
 
 mkdir -p build2
 export LDFLAGS="%{__global_ldflags} -fPIC"
@@ -226,7 +227,7 @@ export CFLAGS="-O0 -g -fPIC"
  -DUSING_QT_UI:BOOL=ON \
  -DLIBRETRO:BOOL=ON \
  %{common_build_options}
-%make_build
+%make_build -C build2
 
 %install
 %make_install -C build
@@ -321,6 +322,7 @@ fi
 %changelog
 * Sun Dec 13 2020 Antonio Trande <sagitter@fedoraproject.org> - 1.10.3-5
 - Fix CMake options
+- Add make BR
 
 * Sat Sep 19 2020 Leigh Scott <leigh123linux@gmail.com> - 1.10.3-4
 - Fix desktop files so appstream data is created
