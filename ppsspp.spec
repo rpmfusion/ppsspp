@@ -1,8 +1,6 @@
 # https://github.com/hrydgard/ppsspp/issues/8823
 ExcludeArch: %{power64}
 
-%global __cmake_in_source_build 1
-
 # Disable LTO flags
 # ... during IPA pass: pure-const
 # lto1: internal compiler error: Segmentation fault
@@ -50,7 +48,7 @@ ExcludeArch: %{power64}
  
 Name:           ppsspp
 Version:        1.10.3
-Release:        4%{?dist}
+Release:        5%{?dist}
 Summary:        A PSP emulator
 License:        BSD and GPLv2+
 URL:            https://www.ppsspp.org/
@@ -177,7 +175,7 @@ find ext Core -perm /755 -type f \( -name "*.cpp" -o -name "*.h" -o -name "*.hpp
 
 
 %build
-mkdir build && pushd build
+mkdir -p build
 
 export LDFLAGS="%{__global_ldflags} -fPIC"
 export CC=gcc
@@ -190,9 +188,9 @@ export CXX=g++
 %if %{with debug}
 export CXXFLAGS="-O0 -g -fPIC"
 export CFLAGS="-O0 -g -fPIC"
-%cmake3 -DCMAKE_BUILD_TYPE:STRING=RelWithDebInfo -DCMAKE_C_FLAGS_RELWITHDEBINFO:STRING="-O0 -g -DDEBUG" -DCMAKE_CXX_FLAGS_RELWITHDEBINFO:STRING="-O0 -g -DDEBUG" \
+%cmake3 -B build -DCMAKE_BUILD_TYPE:STRING=RelWithDebInfo -DCMAKE_C_FLAGS_RELWITHDEBINFO:STRING="-O0 -g -DDEBUG" -DCMAKE_CXX_FLAGS_RELWITHDEBINFO:STRING="-O0 -g -DDEBUG" \
 %else
-%cmake3 -DCMAKE_BUILD_TYPE:STRING=Release \
+%cmake3 -B build -DCMAKE_BUILD_TYPE:STRING=Release \
 %endif
  -DOpenGL_GL_PREFERENCE:STRING=GLVND \
  -DUSING_EGL:BOOL=OFF \
@@ -201,12 +199,10 @@ export CFLAGS="-O0 -g -fPIC"
  -DUSE_WAYLAND_WSI:BOOL=ON \
  -DLIBRETRO:BOOL=OFF \
  -DUSING_QT_UI:BOOL=OFF \
- %{common_build_options} ..
+ %{common_build_options}
 %make_build
-popd
 
-mkdir build2 && pushd build2
-
+mkdir -p build2
 export LDFLAGS="%{__global_ldflags} -fPIC"
 export CC=gcc
 export CXX=g++
@@ -218,9 +214,9 @@ export CXX=g++
 %if %{with debug}
 export CXXFLAGS="-O0 -g -fPIC"
 export CFLAGS="-O0 -g -fPIC"
-%cmake3 -DCMAKE_BUILD_TYPE:STRING=RelWithDebInfo -DCMAKE_C_FLAGS_RELWITHDEBINFO:STRING="-O0 -g -DDEBUG" -DCMAKE_CXX_FLAGS_RELWITHDEBINFO:STRING="-O0 -g -DDEBUG" \
+%cmake3 -B build2 -DCMAKE_BUILD_TYPE:STRING=RelWithDebInfo -DCMAKE_C_FLAGS_RELWITHDEBINFO:STRING="-O0 -g -DDEBUG" -DCMAKE_CXX_FLAGS_RELWITHDEBINFO:STRING="-O0 -g -DDEBUG" \
 %else
-%cmake3 -DCMAKE_BUILD_TYPE:STRING=Release \
+%cmake3 -B build2 -DCMAKE_BUILD_TYPE:STRING=Release \
 %endif
  -DOpenGL_GL_PREFERENCE:STRING=GLVND \
  -DUSING_EGL:BOOL=OFF \
@@ -229,9 +225,8 @@ export CFLAGS="-O0 -g -fPIC"
  -DUSE_WAYLAND_WSI:BOOL=ON \
  -DUSING_QT_UI:BOOL=ON \
  -DLIBRETRO:BOOL=ON \
- %{common_build_options} ..
+ %{common_build_options}
 %make_build
-popd
 
 %install
 %make_install -C build
@@ -324,6 +319,9 @@ fi
 %{_datadir}/icons/%{name}/
 
 %changelog
+* Sun Dec 13 2020 Antonio Trande <sagitter@fedoraproject.org> - 1.10.3-5
+- Fix CMake options
+
 * Sat Sep 19 2020 Leigh Scott <leigh123linux@gmail.com> - 1.10.3-4
 - Fix desktop files so appstream data is created
 
