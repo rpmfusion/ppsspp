@@ -48,7 +48,7 @@ ExcludeArch: %{power64}
  
 Name:           ppsspp
 Version:        1.10.3
-Release:        5%{?dist}
+Release:        6%{?dist}
 Summary:        A PSP emulator
 License:        BSD and GPLv2+
 URL:            https://www.ppsspp.org/
@@ -320,6 +320,9 @@ fi
 %{_datadir}/icons/%{name}/
 
 %changelog
+* Fri Jan  1 2021 Leigh Scott <leigh123linux@gmail.com> - 1.10.3-6
+- Rebuilt for new ffmpeg snapshot
+
 * Sun Dec 13 2020 Antonio Trande <sagitter@fedoraproject.org> - 1.10.3-5
 - Fix CMake options
 - Add make BR
