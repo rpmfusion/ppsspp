@@ -1,0 +1,31 @@
+--- a/ffmpeg/linux_x86-64.orig.sh	2021-01-08 16:07:44.000000000 +0100
++++ b/ffmpeg/linux_x86-64.sh	2021-01-09 19:48:45.528724384 +0100
+@@ -8,8 +8,8 @@
+ ARCH="x86_64"
+ 
+ GENERAL="
+-    --disable-shared \
+-    --enable-static"
++    --enable-shared \
++    --disable-static"
+ 
+ MODULES="\
+     --disable-avdevice \
+@@ -83,7 +83,10 @@
+ ./configure \
+     --prefix=./linux/${ARCH} \
+     ${GENERAL} \
+-    --extra-cflags="-D__STDC_CONSTANT_MACROS -O3" \
++    --cc=gcc \
++    --enable-rpath --disable-stripping \
++    --extra-cflags="-D__STDC_CONSTANT_MACROS ${CFLAGS}" \
++    --extra-ldflags="${LDFLAGS}" \
+     --enable-zlib \
+     --enable-pic \
+     --disable-yasm \
+@@ -99,5 +102,3 @@
+     ${PROTOCOLS} \
+     --arch=${ARCH}
+ 
+-make clean
+-make install
