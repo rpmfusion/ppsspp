@@ -86,7 +86,7 @@ ExcludeArch: %{power64}
  
 Name:           ppsspp
 Version:        1.10.3
-Release:        7%{?dist}
+Release:        8%{?dist}
 Summary:        A PSP emulator
 License:        BSD and GPLv2+
 URL:            https://www.ppsspp.org/
@@ -413,6 +413,9 @@ fi
 %{_datadir}/icons/%{name}/
 
 %changelog
+* Wed Feb 03 2021 RPM Fusion Release Engineering <leigh123linux@gmail.com> - 1.10.3-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
 * Sat Jan 09 2021 Antonio Trande <sagitter@fedoraproject.org> - 1.10.3-7
 - Use bundled FFMpeg-3.0.2 in Fedora 34 (RPM Fusion bz#5889)
 
