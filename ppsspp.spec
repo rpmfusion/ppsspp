@@ -25,7 +25,7 @@ ExcludeArch: %{power64}
 
 # Use bundled FFMpeg-3.0.2
 # See RPM Fusion bz#5889
-%if 0%{?fedora} > 32
+%if 0%{?fedora} > 33
 %bcond_without ffmpeg
 %else
 %bcond_with ffmpeg
@@ -40,9 +40,9 @@ ExcludeArch: %{power64}
 %global __arch aarch64
 %endif
 
-%global commit 087de849bdc74205dd00d8e6e11ba17a591213ab
+%global commit %{nil}
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global date 20200712
+%global date %{nil}
 
 %bcond_with debug
 
@@ -85,8 +85,8 @@ ExcludeArch: %{power64}
  
  
 Name:           ppsspp
-Version:        1.10.3
-Release:        8%{?dist}
+Version:        1.11
+Release:        1%{?dist}
 Summary:        A PSP emulator
 License:        BSD and GPLv2+
 URL:            https://www.ppsspp.org/
@@ -95,16 +95,17 @@ URL:            https://www.ppsspp.org/
 ## We need to checkout it, then download relative submodules
 ## which are not included in the source code:
 ##
-# git clone -b v1.10.3 --depth 1 --single-branch --progress --recursive https://github.com/hrydgard/ppsspp.git
-# cd ppsspp/ffmpeg && git checkout 4738685f4ac27c1775a238d1e602f399627b5e6f
+# git clone -b v1.11 --depth 1 --single-branch --progress --recursive https://github.com/hrydgard/ppsspp.git
+# cd ppsspp/ffmpeg && git checkout ??
 # rm -rf ios Windows* windows* macosx blackberry* gas-preprocessor symbian* wiiu
 # cd ..
 # rm -rf ios Windows* windows* macosx blackberry* symbian*
-# rm -rf dx9sdk pspautotests
+# rm -rf dx9sdk pspautotests MoltenVK
 # cd ..
 # find ppsspp/android -perm /644 -type f \( -name "*.a" \) -exec rm -f {} ';'
-# rm -rf ppsspp-lang/.git
-# rm -rf ppsspp/.git ppsspp/.gitignore
+# find ppsspp -type d \( -name ".git" \) -exec rm -rf {} ';'
+# find ppsspp -type f \( -name ".gitignore" \) -exec rm -rf {} ';'
+# find ppsspp -type f \( -name "*.a" \) -exec rm -rf {} ';'
 # tar -czvf ppsspp-ffmpeg-%%{version}.tar.gz ppsspp
 ##
 Source0:        %{name}-ffmpeg-%{version}.tar.gz
@@ -209,9 +210,11 @@ PPSSPP with Qt5 frontend wrapper.
 
 # Remove bundled libraries
 rm -rf /ext/native/ext/libzip
+rm -rf /ext/native/tools/prebuilt/win64
 rm -rf /ext/rapidjson
 rm -rf /ext/glew
 rm -rf /ext/zlib
+rm -rf /MoltenVK
 %if %{without ffmpeg}
 rm -rf ffmpeg
 %endif
@@ -274,7 +277,9 @@ mkdir -p build
 %if %{with debug}
 export CXXFLAGS="-O0 -g -fPIC"
 export CFLAGS="-O0 -g -fPIC"
-%cmake3 -B build -DCMAKE_BUILD_TYPE:STRING=RelWithDebInfo -DCMAKE_C_FLAGS_RELWITHDEBINFO:STRING="-O0 -g -DDEBUG" -DCMAKE_CXX_FLAGS_RELWITHDEBINFO:STRING="-O0 -g -DDEBUG" \
+%cmake3 -B build -DCMAKE_BUILD_TYPE:STRING=RelWithDebInfo \
+ -DCMAKE_C_FLAGS_RELWITHDEBINFO:STRING="-O0 -g -DDEBUG" \
+ -DCMAKE_CXX_FLAGS_RELWITHDEBINFO:STRING="-O0 -g -DDEBUG" \
 %else
 %cmake3 -B build -DCMAKE_BUILD_TYPE:STRING=Release \
 %endif
@@ -292,7 +297,9 @@ mkdir -p build2
 %if %{with debug}
 export CXXFLAGS="-O0 -g -fPIC"
 export CFLAGS="-O0 -g -fPIC"
-%cmake3 -B build2 -DCMAKE_BUILD_TYPE:STRING=RelWithDebInfo -DCMAKE_C_FLAGS_RELWITHDEBINFO:STRING="-O0 -g -DDEBUG" -DCMAKE_CXX_FLAGS_RELWITHDEBINFO:STRING="-O0 -g -DDEBUG" \
+%cmake3 -B build2 -DCMAKE_BUILD_TYPE:STRING=RelWithDebInfo \
+ -DCMAKE_C_FLAGS_RELWITHDEBINFO:STRING="-O0 -g -DDEBUG" \
+ -DCMAKE_CXX_FLAGS_RELWITHDEBINFO:STRING="-O0 -g -DDEBUG" \
 %else
 %cmake3 -B build2 -DCMAKE_BUILD_TYPE:STRING=Release \
 %endif
@@ -362,6 +369,9 @@ desktop-file-install -m 644 %SOURCE1 --dir=%{buildroot}%{_datadir}/applications
 desktop-file-install -m 644 %SOURCE3 --dir=%{buildroot}%{_datadir}/applications
 desktop-file-install -m 644 %SOURCE5 --dir=%{buildroot}%{_datadir}/applications
 
+# Already installed
+rm -f %{buildroot}%{_datadir}/applications/PPSSPPSDL.desktop
+
 # Install appdata file
 mkdir -p %{buildroot}%{_metainfodir}
 install -pm 644 %SOURCE2 %{buildroot}%{_metainfodir}/
@@ -408,15 +418,19 @@ fi
 %files data
 %doc README.md
 %license LICENSE.TXT
+%{_datadir}/pixmaps/ppsspp.svg
 %{_datadir}/%{name}/
 %{_datadir}/icons/hicolor/*/apps/%{name}.png
 %{_datadir}/icons/%{name}/
 
 %changelog
+* Mon Feb 08 2021 Antonio Trande <sagitter@fedoraproject.org> - 1.11-1
+- Release 1.11
+
 * Wed Feb 03 2021 RPM Fusion Release Engineering <leigh123linux@gmail.com> - 1.10.3-8
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
 
-* Sat Jan 09 2021 Antonio Trande <sagitter@fedoraproject.org> - 1.10.3-7
+* Sun Jan 10 2021 Antonio Trande <sagitter@fedoraproject.org> - 1.10.3-7
 - Use bundled FFMpeg-3.0.2 in Fedora 34 (RPM Fusion bz#5889)
 
 * Fri Jan  1 2021 Leigh Scott <leigh123linux@gmail.com> - 1.10.3-6
