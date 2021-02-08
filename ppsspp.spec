@@ -1,23 +1,48 @@
 # https://github.com/hrydgard/ppsspp/issues/8823
 ExcludeArch: %{power64}
 
-%global __cmake_in_source_build 1
+# Filter private libraries
+%global _privatelibs libglslang
+%global _privatelibs %{_privatelibs}|libSPIRV
+%global _privatelibs %{_privatelibs}|libSPVRemapper
+%global _privatelibs %{_privatelibs}|ppsspp_libretro
+%global _privatelibs %{_privatelibs}|libavcodec
+%global _privatelibs %{_privatelibs}|libavformat
+%global _privatelibs %{_privatelibs}|libswscale
+%global _privatelibs %{_privatelibs}|libswresample
+%global _privatelibs %{_privatelibs}|libavutil
+%global __provides_exclude ^(%{_privatelibs})\\.so.*$
+%global __requires_exclude ^(%{_privatelibs})\\.so.*$
+#
 
 # Disable LTO flags
 # ... during IPA pass: pure-const
 # lto1: internal compiler error: Segmentation fault
 %define _lto_cflags %{nil}
 
-%if 0%{?el7}
-%global dts devtoolset-9-
-%endif
-
 # -Wl,--as-needed breaks linking on fedora 30+ 
 %undefine _ld_as_needed
 
-%global commit 087de849bdc74205dd00d8e6e11ba17a591213ab
+# Use bundled FFMpeg-3.0.2
+# See RPM Fusion bz#5889
+%if 0%{?fedora} > 33
+%bcond_without ffmpeg
+%else
+%bcond_with ffmpeg
+%endif
+%ifarch x86_64
+%global __arch x86_64
+%endif
+%ifarch %{arm}
+%global __arch armv7
+%endif
+%ifarch aarch64
+%global __arch aarch64
+%endif
+
+%global commit %{nil}
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
-%global date 20200712
+%global date %{nil}
 
 %bcond_with debug
 
@@ -26,7 +51,17 @@ ExcludeArch: %{power64}
  -DPYTHON_EXECUTABLE:FILEPATH=%{__python3} \\\
  -Wno-dev -DARMIPS_REGEXP:BOOL=OFF \\\
  -DCMAKE_VERBOSE_MAKEFILE:BOOL=TRUE \\\
- -DUSE_FFMPEG:BOOL=ON -DUSE_SYSTEM_FFMPEG:BOOL=ON \\\
+ -DUSE_FFMPEG:BOOL=ON \\\
+%if %{with ffmpeg} \
+ -DUSE_SYSTEM_FFMPEG:BOOL=OFF \\\
+ -DFFmpeg_LIBRARY_avcodec:FILEPATH=${PWD}/ffmpeg/linux/%{__arch}/lib/libavcodec.so \\\
+ -DFFmpeg_LIBRARY_avformat:FILEPATH=${PWD}/ffmpeg/linux/%{__arch}/lib/libavformat.so \\\
+ -DFFmpeg_LIBRARY_avutil:FILEPATH=${PWD}/ffmpeg/linux/%{__arch}/lib/libavutil.so \\\
+ -DFFmpeg_LIBRARY_swresample:FILEPATH=${PWD}/ffmpeg/linux/%{__arch}/lib/libswresample.so \\\
+ -DFFmpeg_LIBRARY_swscale:FILEPATH=${PWD}/ffmpeg/linux/%{__arch}/lib/libswscale.so \\\
+%else \
+ -DUSE_SYSTEM_FFMPEG:BOOL=ON \\\
+%endif \
  -DUSE_SYSTEM_LIBZIP:BOOL=ON \\\
  -DUSE_SYSTEM_SNAPPY:BOOL=ON \\\
  %ifarch %{ix86} \
@@ -35,7 +70,7 @@ ExcludeArch: %{power64}
  %ifarch %{arm} aarch64 \
  -DARM:BOOL=ON \\\
  %endif \
- %ifarch armv7l armv7hl armv7hnl \
+ %ifarch %{arm} \
  -DARMV7:BOOL=ON \\\
  %endif \
  %ifarch x86_64 \
@@ -45,12 +80,13 @@ ExcludeArch: %{power64}
  -DENABLE_GLSLANG_BINARIES:BOOL=OFF \\\
  -DENABLE_HLSL:BOOL=OFF \\\
  -DOPENGL_xmesa_INCLUDE_DIR:PATH= \\\
- -DHEADLESS=OFF -DZLIB_INCLUDE_DIR:PATH=%{_includedir}
+ -DHEADLESS=OFF -DZLIB_INCLUDE_DIR:PATH=%{_includedir} \\\
+ -DPNG_PNG_INCLUDE_DIR:PATH=%{_includedir}
  
  
 Name:           ppsspp
-Version:        1.10.3
-Release:        4%{?dist}
+Version:        1.11
+Release:        1%{?dist}
 Summary:        A PSP emulator
 License:        BSD and GPLv2+
 URL:            https://www.ppsspp.org/
@@ -59,19 +95,20 @@ URL:            https://www.ppsspp.org/
 ## We need to checkout it, then download relative submodules
 ## which are not included in the source code:
 ##
-# git clone https://github.com/hrydgard/ppsspp.git
-# cd ppsspp && git checkout %%{commit}
-# git submodule update --init ext/armips
-# git submodule update --init ext/glslang
-# git submodule update --init ext/SPIRV-Cross
-# git submodule update --init ext/discord-rpc
-# git clone https://github.com/hrydgard/ppsspp-lang
-# rm -rf ppsspp-lang/.git
+# git clone -b v1.11 --depth 1 --single-branch --progress --recursive https://github.com/hrydgard/ppsspp.git
+# cd ppsspp/ffmpeg && git checkout ??
+# rm -rf ios Windows* windows* macosx blackberry* gas-preprocessor symbian* wiiu
 # cd ..
-# rm -rf ppsspp/.git ppsspp/.gitignore
-# tar -czvf ppsspp-%%{version}.tar.gz ppsspp
+# rm -rf ios Windows* windows* macosx blackberry* symbian*
+# rm -rf dx9sdk pspautotests MoltenVK
+# cd ..
+# find ppsspp/android -perm /644 -type f \( -name "*.a" \) -exec rm -f {} ';'
+# find ppsspp -type d \( -name ".git" \) -exec rm -rf {} ';'
+# find ppsspp -type f \( -name ".gitignore" \) -exec rm -rf {} ';'
+# find ppsspp -type f \( -name "*.a" \) -exec rm -rf {} ';'
+# tar -czvf ppsspp-ffmpeg-%%{version}.tar.gz ppsspp
 ##
-Source0:        ppsspp-%{version}.tar.gz
+Source0:        %{name}-ffmpeg-%{version}.tar.gz
 Source1:        %{name}.desktop
 Source2:        %{name}.appdata.xml
 Source3:        %{name}-qt.desktop
@@ -84,29 +121,32 @@ Source5:        %{name}-qt-wayland.desktop
 Patch0: %{name}-1.1.0-git-version.patch
 Patch1: %{name}-1.10.0-remove_unrecognized_flag.patch
 
+Patch2: %{name}-ffmpeg-set_x64_build_flags.patch
+Patch3: %{name}-ffmpeg-set_aarch64_build_flags.patch
+Patch4: %{name}-ffmpeg-set_arm_build_flags.patch
+
 BuildRequires:  pkgconfig(egl)
 BuildRequires:  pkgconfig(glesv2)
-%if 0%{?fedora} && 0%{?fedora} > 31
-BuildRequires: pkgconfig(opengl)
-%endif
-%if 0%{?fedora} && 0%{?fedora} < 32
-BuildRequires: pkgconfig(libglvnd)
-%endif
+BuildRequires:  pkgconfig(opengl)
 %{?fedora:BuildRequires: pkgconfig(libpng)}
 %{?el7:BuildRequires: libglvnd-devel}
 %{?el7:BuildRequires: pkgconfig(libpng)}
 %{?el8:BuildRequires: pkgconfig(libpng16)}
-BuildRequires:  pkgconfig(glew)
 BuildRequires:  cmake3
+BuildRequires:  make
 BuildRequires:  python%{python3_pkgversion}-devel
 BuildRequires:  python%{python3_pkgversion}-setuptools
-BuildRequires:  chrpath
+BuildRequires:  patchelf
 BuildRequires:  desktop-file-utils
+%if %{without ffmpeg}
 BuildRequires:  ffmpeg-devel
+%endif
+BuildRequires:  pkgconfig(glew)
+BuildRequires:  pkgconfig(glu)
 BuildRequires:  wayland-devel
 BuildRequires:  snappy-devel
 BuildRequires:  SDL2-devel
-BuildRequires:  %{?dts}gcc, %{?dts}gcc-c++
+BuildRequires:  gcc gcc-c++
 BuildRequires:  libzip-devel
 BuildRequires:  snappy-devel
 BuildRequires:  zlib-devel
@@ -129,6 +169,15 @@ Data files of %{name}.
 
 %package libs
 Summary: PPSSPP private libraries
+%if %{with ffmpeg}
+License: GPLv3+ and LGPLv2+
+Provides: bundled(ffmpeg) = 0:3.0.2
+Provides: bundled(libavcodec) = 57
+Provides: bundled(libavformat) = 57
+Provides: bundled(libavutil) = 57
+Provides: bundled(libswresample) = 2
+Provides: bundled(libswscale) = 4
+%endif
 %description libs
 Private libraries used by PPSSPP.
 
@@ -151,10 +200,24 @@ PPSSPP with Qt5 frontend wrapper.
 
 
 %prep
-%autosetup -n %{name} -p1
+%autosetup -n %{name} -N
 
-# Remove bundled libzip libraries
+%patch0 -p1 -b .backup
+%patch1 -p1 -b .backup
+%patch2 -p1 -b .backup
+%patch3 -p1 -b .backup
+%patch4 -p1 -b .backup
+
+# Remove bundled libraries
 rm -rf /ext/native/ext/libzip
+rm -rf /ext/native/tools/prebuilt/win64
+rm -rf /ext/rapidjson
+rm -rf /ext/glew
+rm -rf /ext/zlib
+rm -rf /MoltenVK
+%if %{without ffmpeg}
+rm -rf ffmpeg
+%endif
 
 # Set version
 sed -e 's|@@unknown_version@@|%{version}|g' -i git-version.cmake
@@ -177,22 +240,48 @@ find ext Core -perm /755 -type f \( -name "*.cpp" -o -name "*.h" -o -name "*.hpp
 
 
 %build
-mkdir build && pushd build
 
-export LDFLAGS="%{__global_ldflags} -fPIC"
-export CC=gcc
-export CXX=g++
+# Build bundled ffmpeg's shared libraries
+# 'make install' command moves compiled libraries into linux/arch/lib directory
+%if %{with ffmpeg}
 
-%if 0%{?el7}
-%{?dts:source /opt/rh/devtoolset-9/enable}
+# Remove pre-compiled ffmpeg static libraries
+find ffmpeg -type f \( -name "*.a" \) -exec  rm -f {} ';'
+
+pushd ffmpeg
+export CFLAGS="%{optflags}"
+export LDFLAGS="%{__global_ldflags}"
+
+%ifarch x86_64
+sh -x ./linux_x86-64.sh
+%make_build
+make install
 %endif
 
+%ifarch aarch64
+sh -x ./linux_arm64.sh
+%make_build
+make install
+%endif
+
+%ifarch %{arm}
+sh -x ./linux_arm.sh
+%make_build
+make install
+%endif
+popd
+%endif
+#
+
+mkdir -p build
 %if %{with debug}
 export CXXFLAGS="-O0 -g -fPIC"
 export CFLAGS="-O0 -g -fPIC"
-%cmake3 -DCMAKE_BUILD_TYPE:STRING=RelWithDebInfo -DCMAKE_C_FLAGS_RELWITHDEBINFO:STRING="-O0 -g -DDEBUG" -DCMAKE_CXX_FLAGS_RELWITHDEBINFO:STRING="-O0 -g -DDEBUG" \
+%cmake3 -B build -DCMAKE_BUILD_TYPE:STRING=RelWithDebInfo \
+ -DCMAKE_C_FLAGS_RELWITHDEBINFO:STRING="-O0 -g -DDEBUG" \
+ -DCMAKE_CXX_FLAGS_RELWITHDEBINFO:STRING="-O0 -g -DDEBUG" \
 %else
-%cmake3 -DCMAKE_BUILD_TYPE:STRING=Release \
+%cmake3 -B build -DCMAKE_BUILD_TYPE:STRING=Release \
 %endif
  -DOpenGL_GL_PREFERENCE:STRING=GLVND \
  -DUSING_EGL:BOOL=OFF \
@@ -201,26 +290,18 @@ export CFLAGS="-O0 -g -fPIC"
  -DUSE_WAYLAND_WSI:BOOL=ON \
  -DLIBRETRO:BOOL=OFF \
  -DUSING_QT_UI:BOOL=OFF \
- %{common_build_options} ..
-%make_build
-popd
+ %{common_build_options}
+%make_build -C build
 
-mkdir build2 && pushd build2
-
-export LDFLAGS="%{__global_ldflags} -fPIC"
-export CC=gcc
-export CXX=g++
-
-%if 0%{?el7}
-%{?dts:source /opt/rh/devtoolset-9/enable}
-%endif
-
+mkdir -p build2
 %if %{with debug}
 export CXXFLAGS="-O0 -g -fPIC"
 export CFLAGS="-O0 -g -fPIC"
-%cmake3 -DCMAKE_BUILD_TYPE:STRING=RelWithDebInfo -DCMAKE_C_FLAGS_RELWITHDEBINFO:STRING="-O0 -g -DDEBUG" -DCMAKE_CXX_FLAGS_RELWITHDEBINFO:STRING="-O0 -g -DDEBUG" \
+%cmake3 -B build2 -DCMAKE_BUILD_TYPE:STRING=RelWithDebInfo \
+ -DCMAKE_C_FLAGS_RELWITHDEBINFO:STRING="-O0 -g -DDEBUG" \
+ -DCMAKE_CXX_FLAGS_RELWITHDEBINFO:STRING="-O0 -g -DDEBUG" \
 %else
-%cmake3 -DCMAKE_BUILD_TYPE:STRING=Release \
+%cmake3 -B build2 -DCMAKE_BUILD_TYPE:STRING=Release \
 %endif
  -DOpenGL_GL_PREFERENCE:STRING=GLVND \
  -DUSING_EGL:BOOL=OFF \
@@ -229,9 +310,8 @@ export CFLAGS="-O0 -g -fPIC"
  -DUSE_WAYLAND_WSI:BOOL=ON \
  -DUSING_QT_UI:BOOL=ON \
  -DLIBRETRO:BOOL=ON \
- %{common_build_options} ..
-%make_build
-popd
+ %{common_build_options}
+%make_build -C build2
 
 %install
 %make_install -C build
@@ -243,21 +323,34 @@ install -pm 755 build/PPSSPPSDL %{buildroot}%{_bindir}/
 
 # Install libraries
 mkdir -p %{buildroot}%{_libdir}/%{name}
-cp -a build2/lib/*.a %{buildroot}%{_libdir}/%{name}/
-cp -a build2/lib/*.so %{buildroot}%{_libdir}/%{name}/
+cp -a build2/lib/*.so* %{buildroot}%{_libdir}/%{name}/
+cp -u build/lib/*.so* %{buildroot}%{_libdir}/%{name}/
 
-cp -u build/lib/*.a %{buildroot}%{_libdir}/%{name}/
-cp -u build/lib/*.so %{buildroot}%{_libdir}/%{name}/
+%if %{with ffmpeg}
+pushd ffmpeg/linux/%{__arch}/lib
+install -pm 755 *.so* %{buildroot}%{_libdir}/%{name}/
+popd
+pushd %{buildroot}%{_libdir}/%{name}
+ln -sf libavcodec.so.57.24.102 libavcodec.so.57
+ln -sf libavcodec.so.57.24.102 libavcodec.so
+ln -sf libavformat.so.57.25.100 libavformat.so.57
+ln -sf libavformat.so.57.25.100 libavformat.so
+ln -sf libavutil.so.55.17.103 libavutil.so.55
+ln -sf libavutil.so.55.17.103 libavutil.so
+ln -sf libswresample.so.2.0.101 libswresample.so.2
+ln -sf libswresample.so.2.0.101 libswresample.so
+ln -sf libswscale.so.4.0.100 libswscale.so.4
+ln -sf libswscale.so.4.0.100 libswscale.so
+popd
+%endif
 
 # Fix rpaths
-chrpath -r %{_libdir}/%{name} %{buildroot}%{_bindir}/PPSSPP*
-chrpath -d %{buildroot}%{_libdir}/%{name}/*.so
+patchelf --set-rpath %{_libdir}/%{name} %{buildroot}%{_bindir}/PPSSPP*
+patchelf --set-rpath %{_libdir}/%{name} %{buildroot}%{_libdir}/%{name}/*.so*
 
 # Install data files
 mkdir -p %{buildroot}%{_datadir}/%{name}
 cp -a build2/assets %{buildroot}%{_datadir}/%{name}/
-
-install -pm 644 ppsspp-lang/*.ini %{buildroot}%{_datadir}/%{name}/assets/lang/
 install -pm 644 Qt/languages/*.ts %{buildroot}%{_datadir}/%{name}/assets/lang/
 install -pm 644 korean.txt %{buildroot}%{_datadir}/%{name}/assets/lang/korean.ini
 install -pm 644 chinese.txt %{buildroot}%{_datadir}/%{name}/assets/lang/chinese.ini
@@ -275,6 +368,9 @@ mkdir -p %{buildroot}%{_datadir}/applications
 desktop-file-install -m 644 %SOURCE1 --dir=%{buildroot}%{_datadir}/applications
 desktop-file-install -m 644 %SOURCE3 --dir=%{buildroot}%{_datadir}/applications
 desktop-file-install -m 644 %SOURCE5 --dir=%{buildroot}%{_datadir}/applications
+
+# Already installed
+rm -f %{buildroot}%{_datadir}/applications/PPSSPPSDL.desktop
 
 # Install appdata file
 mkdir -p %{buildroot}%{_metainfodir}
@@ -314,16 +410,36 @@ fi
 %files libs
 %doc README.md
 %license LICENSE.TXT
+%if %{with ffmpeg}
+%license ffmpeg/COPYING* ffmpeg/LICENSE.md
+%endif
 %{_libdir}/%{name}/
 
 %files data
 %doc README.md
 %license LICENSE.TXT
+%{_datadir}/pixmaps/ppsspp.svg
 %{_datadir}/%{name}/
 %{_datadir}/icons/hicolor/*/apps/%{name}.png
 %{_datadir}/icons/%{name}/
 
 %changelog
+* Mon Feb 08 2021 Antonio Trande <sagitter@fedoraproject.org> - 1.11-1
+- Release 1.11
+
+* Wed Feb 03 2021 RPM Fusion Release Engineering <leigh123linux@gmail.com> - 1.10.3-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Sun Jan 10 2021 Antonio Trande <sagitter@fedoraproject.org> - 1.10.3-7
+- Use bundled FFMpeg-3.0.2 in Fedora 34 (RPM Fusion bz#5889)
+
+* Fri Jan  1 2021 Leigh Scott <leigh123linux@gmail.com> - 1.10.3-6
+- Rebuilt for new ffmpeg snapshot
+
+* Sun Dec 13 2020 Antonio Trande <sagitter@fedoraproject.org> - 1.10.3-5
+- Fix CMake options
+- Add make BR
+
 * Sat Sep 19 2020 Leigh Scott <leigh123linux@gmail.com> - 1.10.3-4
 - Fix desktop files so appstream data is created
 
