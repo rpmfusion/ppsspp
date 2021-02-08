@@ -2,17 +2,8 @@
 ExcludeArch: %{power64}
 
 # Filter private libraries
-%global _privatelibs libglslang
-%global _privatelibs %{_privatelibs}|libSPIRV
-%global _privatelibs %{_privatelibs}|libSPVRemapper
-%global _privatelibs %{_privatelibs}|ppsspp_libretro
-%global _privatelibs %{_privatelibs}|libavcodec
-%global _privatelibs %{_privatelibs}|libavformat
-%global _privatelibs %{_privatelibs}|libswscale
-%global _privatelibs %{_privatelibs}|libswresample
-%global _privatelibs %{_privatelibs}|libavutil
-%global __provides_exclude ^(%{_privatelibs})\\.so.*$
-%global __requires_exclude ^(%{_privatelibs})\\.so.*$
+%global __provides_exclude ^(%%(find %{buildroot}%{_libdir}/ppsspp -name '*.so' | xargs -n1 basename | sort -u | paste -s -d '|' -))
+%global __requires_exclude ^(%%(find %{buildroot}%{_libdir}/ppsspp -name '*.so' | xargs -n1 basename | sort -u | paste -s -d '|' -))
 #
 
 # Disable LTO flags
@@ -86,7 +77,7 @@ ExcludeArch: %{power64}
  
 Name:           ppsspp
 Version:        1.11
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        A PSP emulator
 License:        BSD and GPLv2+
 URL:            https://www.ppsspp.org/
@@ -424,6 +415,9 @@ fi
 %{_datadir}/icons/%{name}/
 
 %changelog
+* Mon Feb 08 2021 Antonio Trande <sagitter@fedoraproject.org> - 1.11-2
+- Change filtering method of private libraries
+
 * Mon Feb 08 2021 Antonio Trande <sagitter@fedoraproject.org> - 1.11-1
 - Release 1.11
 
