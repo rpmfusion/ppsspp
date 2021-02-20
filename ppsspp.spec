@@ -11,13 +11,13 @@ ExcludeArch: %{power64}
 # lto1: internal compiler error: Segmentation fault
 %define _lto_cflags %{nil}
 
-# -Wl,--as-needed breaks linking on fedora 30+ 
+# -Wl,--as-needed breaks linking
 %undefine _ld_as_needed
 
 # Use bundled FFMpeg-3.0.2
 # See RPM Fusion bz#5889
 %if 0%{?fedora} > 33
-%bcond_without ffmpeg
+%bcond_with ffmpeg
 %else
 %bcond_with ffmpeg
 %endif
@@ -77,7 +77,7 @@ ExcludeArch: %{power64}
  
 Name:           ppsspp
 Version:        1.11
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        A PSP emulator
 License:        BSD and GPLv2+
 URL:            https://www.ppsspp.org/
@@ -115,6 +115,10 @@ Patch1: %{name}-1.10.0-remove_unrecognized_flag.patch
 Patch2: %{name}-ffmpeg-set_x64_build_flags.patch
 Patch3: %{name}-ffmpeg-set_aarch64_build_flags.patch
 Patch4: %{name}-ffmpeg-set_arm_build_flags.patch
+
+# Remove deprecated API calls for new FFmpeg 4.3.x
+# This patch permits FFMpeg unbundling
+Patch5: %{name}-upstream_bug_14176.patch
 
 BuildRequires:  pkgconfig(egl)
 BuildRequires:  pkgconfig(glesv2)
@@ -198,6 +202,10 @@ PPSSPP with Qt5 frontend wrapper.
 %patch2 -p1 -b .backup
 %patch3 -p1 -b .backup
 %patch4 -p1 -b .backup
+
+%if %{without ffmpeg}
+%patch5 -p1 -b .backup
+%endif
 
 # Remove bundled libraries
 rm -rf /ext/native/ext/libzip
@@ -415,6 +423,9 @@ fi
 %{_datadir}/icons/%{name}/
 
 %changelog
+* Sat Feb 20 2021 Antonio Trande <sagitter@fedoraproject.org> - 1.11-3
+- Unbundle FFmpeg (upstream bug #13849)
+
 * Mon Feb 08 2021 Antonio Trande <sagitter@fedoraproject.org> - 1.11-2
 - Change filtering method of private libraries
 
