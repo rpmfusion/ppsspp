@@ -77,7 +77,7 @@ ExcludeArch: %{power64}
  
 Name:           ppsspp
 Version:        1.11
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        A PSP emulator
 License:        BSD and GPLv2+
 URL:            https://www.ppsspp.org/
@@ -423,6 +423,9 @@ fi
 %{_datadir}/icons/%{name}/
 
 %changelog
+* Sat Apr 24 2021 Leigh Scott <leigh123linux@gmail.com> - 1.11-4
+- Rebuilt for removed libstdc++ symbol (#1937698)
+
 * Sat Feb 20 2021 Antonio Trande <sagitter@fedoraproject.org> - 1.11-3
 - Unbundle FFmpeg (upstream bug #13849)
 
