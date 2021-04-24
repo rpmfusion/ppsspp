@@ -16,11 +16,8 @@ ExcludeArch: %{power64}
 
 # Use bundled FFMpeg-3.0.2
 # See RPM Fusion bz#5889
-%if 0%{?fedora} > 33
 %bcond_with ffmpeg
-%else
-%bcond_with ffmpeg
-%endif
+
 %ifarch x86_64
 %global __arch x86_64
 %endif
@@ -76,8 +73,8 @@ ExcludeArch: %{power64}
  
  
 Name:           ppsspp
-Version:        1.11
-Release:        4%{?dist}
+Version:        1.11.3
+Release:        1%{?dist}
 Summary:        A PSP emulator
 License:        BSD and GPLv2+
 URL:            https://www.ppsspp.org/
@@ -86,7 +83,7 @@ URL:            https://www.ppsspp.org/
 ## We need to checkout it, then download relative submodules
 ## which are not included in the source code:
 ##
-# git clone -b v1.11 --depth 1 --single-branch --progress --recursive https://github.com/hrydgard/ppsspp.git
+# git clone -b v1.11.3 --depth 1 --single-branch --progress --recursive https://github.com/hrydgard/ppsspp.git
 # cd ppsspp/ffmpeg && git checkout ??
 # rm -rf ios Windows* windows* macosx blackberry* gas-preprocessor symbian* wiiu
 # cd ..
@@ -423,6 +420,9 @@ fi
 %{_datadir}/icons/%{name}/
 
 %changelog
+* Sat Apr 24 2021 Antonio Trande <sagitter@fedoraproject.org> - 1.11.3-1
+- Release 1.11.3
+
 * Sat Apr 24 2021 Leigh Scott <leigh123linux@gmail.com> - 1.11-4
 - Rebuilt for removed libstdc++ symbol (#1937698)
 
