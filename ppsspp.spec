@@ -73,8 +73,8 @@ ExcludeArch: %{power64}
  
  
 Name:           ppsspp
-Version:        1.11.3
-Release:        2%{?dist}
+Version:        1.12
+Release:        1%{?dist}
 Summary:        A PSP emulator
 License:        BSD and GPLv2+
 URL:            https://www.ppsspp.org/
@@ -96,7 +96,11 @@ URL:            https://www.ppsspp.org/
 # find ppsspp -type f \( -name "*.a" \) -exec rm -rf {} ';'
 # tar -czvf ppsspp-ffmpeg-%%{version}.tar.gz ppsspp
 ##
+%if %{with ffmpeg}
 Source0:        %{name}-ffmpeg-%{version}.tar.gz
+%else
+Source0:        %{name}-%{version}.tar.gz
+%endif
 Source1:        %{name}.desktop
 Source2:        %{name}.appdata.xml
 Source3:        %{name}-qt.desktop
@@ -112,10 +116,6 @@ Patch1: %{name}-1.10.0-remove_unrecognized_flag.patch
 Patch2: %{name}-ffmpeg-set_x64_build_flags.patch
 Patch3: %{name}-ffmpeg-set_aarch64_build_flags.patch
 Patch4: %{name}-ffmpeg-set_arm_build_flags.patch
-
-# Remove deprecated API calls for new FFmpeg 4.3.x
-# This patch permits FFMpeg unbundling
-Patch5: %{name}-upstream_bug_14176.patch
 
 BuildRequires:  pkgconfig(egl)
 BuildRequires:  pkgconfig(glesv2)
@@ -196,12 +196,11 @@ PPSSPP with Qt5 frontend wrapper.
 
 %patch0 -p1 -b .backup
 %patch1 -p1 -b .backup
+
+%if %{with ffmpeg}
 %patch2 -p1 -b .backup
 %patch3 -p1 -b .backup
 %patch4 -p1 -b .backup
-
-%if %{without ffmpeg}
-%patch5 -p1 -b .backup
 %endif
 
 # Remove bundled libraries
@@ -420,6 +419,9 @@ fi
 %{_datadir}/icons/%{name}/
 
 %changelog
+* Fri Oct 08 2021 Antonio Trande <sagitter@fedoraproject.org> - 1.12-1
+- Release 1.12
+
 * Tue Aug 03 2021 RPM Fusion Release Engineering <leigh123linux@gmail.com> - 1.11.3-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
 
