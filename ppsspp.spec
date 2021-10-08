@@ -270,17 +270,19 @@ popd
 
 mkdir -p build
 %if %{with debug}
-export CXXFLAGS="-O0 -g -fPIC"
-export CFLAGS="-O0 -g -fPIC"
+export CXXFLAGS="-O0 -g -fPIC -lEGL -lGLESv2"
+export CFLAGS="-O0 -g -fPIC -lEGL -lGLESv2"
 %cmake3 -B build -DCMAKE_BUILD_TYPE:STRING=RelWithDebInfo \
  -DCMAKE_C_FLAGS_RELWITHDEBINFO:STRING="-O0 -g -DDEBUG" \
  -DCMAKE_CXX_FLAGS_RELWITHDEBINFO:STRING="-O0 -g -DDEBUG" \
 %else
+export CXXFLAGS="%{build_cxxflags} -fPIC -lEGL -lGLESv2"
+export CFLAGS="%{build_cflags} -fPIC -lEGL -lGLESv2"
 %cmake3 -B build -DCMAKE_BUILD_TYPE:STRING=Release \
 %endif
  -DOpenGL_GL_PREFERENCE:STRING=GLVND \
- -DUSING_EGL:BOOL=OFF \
- -DUSING_GLES2:BOOL=OFF \
+ -DUSING_EGL:BOOL=ON \
+ -DUSING_GLES2:BOOL=ON \
  -DUSING_X11_VULKAN:BOOL=ON \
  -DUSE_WAYLAND_WSI:BOOL=ON \
  -DLIBRETRO:BOOL=OFF \
@@ -290,17 +292,19 @@ export CFLAGS="-O0 -g -fPIC"
 
 mkdir -p build2
 %if %{with debug}
-export CXXFLAGS="-O0 -g -fPIC"
-export CFLAGS="-O0 -g -fPIC"
+export CXXFLAGS="-O0 -g -fPIC -lEGL -lGLESv2"
+export CFLAGS="-O0 -g -fPIC -lEGL -lGLESv2"
 %cmake3 -B build2 -DCMAKE_BUILD_TYPE:STRING=RelWithDebInfo \
  -DCMAKE_C_FLAGS_RELWITHDEBINFO:STRING="-O0 -g -DDEBUG" \
  -DCMAKE_CXX_FLAGS_RELWITHDEBINFO:STRING="-O0 -g -DDEBUG" \
 %else
+export CXXFLAGS="%{build_cxxflags} -fPIC -lEGL -lGLESv2"
+export CFLAGS="%{build_cflags} -fPIC -lEGL -lGLESv2"
 %cmake3 -B build2 -DCMAKE_BUILD_TYPE:STRING=Release \
 %endif
  -DOpenGL_GL_PREFERENCE:STRING=GLVND \
- -DUSING_EGL:BOOL=OFF \
- -DUSING_GLES2:BOOL=OFF \
+ -DUSING_EGL:BOOL=ON \
+ -DUSING_GLES2:BOOL=ON \
  -DUSING_X11_VULKAN:BOOL=ON \
  -DUSE_WAYLAND_WSI:BOOL=ON \
  -DUSING_QT_UI:BOOL=ON \
@@ -421,6 +425,7 @@ fi
 %changelog
 * Fri Oct 08 2021 Antonio Trande <sagitter@fedoraproject.org> - 1.12-1
 - Release 1.12
+- Enable USING_EGL/USING_GLES2 options
 
 * Tue Aug 03 2021 RPM Fusion Release Engineering <leigh123linux@gmail.com> - 1.11.3-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
