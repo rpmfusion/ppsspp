@@ -73,7 +73,7 @@ ExcludeArch: %{power64}
  
  
 Name:           ppsspp
-Version:        1.12
+Version:        1.12.1
 Release:        1%{?dist}
 Summary:        A PSP emulator
 License:        BSD and GPLv2+
@@ -90,11 +90,12 @@ URL:            https://www.ppsspp.org/
 # rm -rf ios Windows* windows* macosx blackberry* symbian*
 # rm -rf dx9sdk pspautotests MoltenVK
 # cd ..
+# (if not used) find ppsspp -type d \( -name "ffmpeg" \) -exec rm -rf {} ';'
 # find ppsspp/android -perm /644 -type f \( -name "*.a" \) -exec rm -f {} ';'
-# find ppsspp -type d \( -name ".git" \) -exec rm -rf {} ';'
+# find ppsspp -type d \( -name ".git*" \) -exec rm -rf {} ';'
 # find ppsspp -type f \( -name ".gitignore" \) -exec rm -rf {} ';'
 # find ppsspp -type f \( -name "*.a" \) -exec rm -rf {} ';'
-# tar -czvf ppsspp-ffmpeg-%%{version}.tar.gz ppsspp
+# tar -czvf ppsspp-%%{version}.tar.gz ppsspp
 ##
 %if %{with ffmpeg}
 Source0:        %{name}-ffmpeg-%{version}.tar.gz
@@ -423,6 +424,9 @@ fi
 %{_datadir}/icons/%{name}/
 
 %changelog
+* Sat Oct 09 2021 Antonio Trande <sagitter@fedoraproject.org> - 1.12.1-1
+- Release 1.12.1
+
 * Fri Oct 08 2021 Antonio Trande <sagitter@fedoraproject.org> - 1.12-1
 - Release 1.12
 - Enable USING_EGL/USING_GLES2 options
