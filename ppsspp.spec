@@ -73,7 +73,7 @@ ExcludeArch: %{power64}
  
  
 Name:           ppsspp
-Version:        1.12.1
+Version:        1.12.2
 Release:        1%{?dist}
 Summary:        A PSP emulator
 License:        BSD and GPLv2+
@@ -83,7 +83,7 @@ URL:            https://www.ppsspp.org/
 ## We need to checkout it, then download relative submodules
 ## which are not included in the source code:
 ##
-# git clone -b v1.11.3 --depth 1 --single-branch --progress --recursive https://github.com/hrydgard/ppsspp.git
+# git clone -b v1.12.2 --depth 1 --single-branch --progress --recursive https://github.com/hrydgard/ppsspp.git
 # cd ppsspp/ffmpeg && git checkout ??
 # rm -rf ios Windows* windows* macosx blackberry* gas-preprocessor symbian* wiiu
 # cd ..
@@ -424,6 +424,9 @@ fi
 %{_datadir}/icons/%{name}/
 
 %changelog
+* Wed Oct 13 2021 Antonio Trande <sagitter@fedoraproject.org> - 1.12.2-1
+- Release 1.12.2
+
 * Sat Oct 09 2021 Antonio Trande <sagitter@fedoraproject.org> - 1.12.1-1
 - Release 1.12.1
 
