@@ -15,8 +15,8 @@ ExcludeArch: %{power64}
 %undefine _ld_as_needed
 
 # Use bundled FFMpeg-3.0.2
-# See RPM Fusion bz#5889
-%bcond_with ffmpeg
+# See RPM Fusion bz#5889, and upstream bug #15308
+%bcond_without ffmpeg
 
 %ifarch x86_64
 %global __arch x86_64
@@ -425,7 +425,7 @@ fi
 
 %changelog
 * Sat Feb 05 2022 Antonio Trande <sagitter@fedoraproject.org> - 1.12.3-2
-- Rebuild for FFMpeg-5.0
+- Rebuild against bundled FFMpeg-3.0.2 (upstream bug #15308)
 
 * Wed Oct 20 2021 Antonio Trande <sagitter@fedoraproject.org> - 1.12.3-1
 - Release 1.12.3
