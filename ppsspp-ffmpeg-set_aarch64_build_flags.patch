@@ -15,7 +15,7 @@
  
  #~ GENERAL="\
     #~ --enable-cross-compile \
-@@ -86,9 +84,10 @@
+@@ -86,9 +86,10 @@
  ./configure --target-os=linux \
      --prefix=./linux/aarch64 \
      ${GENERAL} \
@@ -27,9 +27,9 @@
 +    --enable-shared \
 +    --disable-static \
      --enable-zlib \
+     --enable-pic \
      --disable-everything \
-     ${MODULES} \
-@@ -99,8 +98,6 @@
+@@ -100,8 +101,6 @@
      ${DEMUXERS} \
      ${MUXERS} \
      ${PARSERS}

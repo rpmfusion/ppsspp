@@ -83,8 +83,8 @@ URL:            https://www.ppsspp.org/
 ## We need to checkout it, then download relative submodules
 ## which are not included in the source code:
 ##
-# git clone -b v1.12.2 --depth 1 --single-branch --progress --recursive https://github.com/hrydgard/ppsspp.git
-# cd ppsspp/ffmpeg && git checkout ??
+# git clone -b v1.12.3 --depth 1 --single-branch --progress --recursive https://github.com/hrydgard/ppsspp.git
+# cd ppsspp/ffmpeg && git checkout ?70bfd4a77487e56ef60b4adfc47f714cfea59794
 # rm -rf ios Windows* windows* macosx blackberry* gas-preprocessor symbian* wiiu
 # cd ..
 # rm -rf ios Windows* windows* macosx blackberry* symbian*
@@ -95,7 +95,7 @@ URL:            https://www.ppsspp.org/
 # find ppsspp -type d \( -name ".git*" \) -exec rm -rf {} ';'
 # find ppsspp -type f \( -name ".gitignore" \) -exec rm -rf {} ';'
 # find ppsspp -type f \( -name "*.a" \) -exec rm -rf {} ';'
-# tar -czvf ppsspp-%%{version}.tar.gz ppsspp
+# tar -czvf ppsspp-ffmpeg-%%{version}.tar.gz ppsspp
 ##
 %if %{with ffmpeg}
 Source0:        %{name}-ffmpeg-%{version}.tar.gz
@@ -424,7 +424,8 @@ fi
 %{_datadir}/icons/%{name}/
 
 %changelog
-* Sat Feb 05 2022 Antonio Trande <sagitter@fedoraproject.org> - 1.12.3-2
+* Sun Feb 06 2022 Antonio Trande <sagitter@fedoraproject.org> - 1.12.3-2
+- Source archive re-generated including bundled FFMpeg
 - Rebuild against bundled FFMpeg-3.0.2 (upstream bug #15308)
 
 * Wed Oct 20 2021 Antonio Trande <sagitter@fedoraproject.org> - 1.12.3-1
