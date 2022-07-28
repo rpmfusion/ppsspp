@@ -73,8 +73,8 @@ ExcludeArch: %{power64}
  
  
 Name:           ppsspp
-Version:        1.12.3
-Release:        2%{?dist}
+Version:        1.13
+Release:        1%{?dist}
 Summary:        A PSP emulator
 License:        BSD and GPLv2+
 URL:            https://www.ppsspp.org/
@@ -83,7 +83,7 @@ URL:            https://www.ppsspp.org/
 ## We need to checkout it, then download relative submodules
 ## which are not included in the source code:
 ##
-# git clone -b v1.12.3 --depth 1 --single-branch --progress --recursive https://github.com/hrydgard/ppsspp.git
+# git clone -b v1.13 --depth 1 --single-branch --progress --recursive https://github.com/hrydgard/ppsspp.git
 # cd ppsspp/ffmpeg && git checkout ?70bfd4a77487e56ef60b4adfc47f714cfea59794
 # rm -rf ios Windows* windows* macosx blackberry* gas-preprocessor symbian* wiiu
 # cd ..
@@ -112,8 +112,6 @@ Source5:        %{name}-qt-wayland.desktop
 
 # Fix version
 Patch0: %{name}-1.1.0-git-version.patch
-Patch1: %{name}-1.10.0-remove_unrecognized_flag.patch
-
 Patch2: %{name}-ffmpeg-set_x64_build_flags.patch
 Patch3: %{name}-ffmpeg-set_aarch64_build_flags.patch
 Patch4: %{name}-ffmpeg-set_arm_build_flags.patch
@@ -196,7 +194,6 @@ PPSSPP with Qt5 frontend wrapper.
 %autosetup -n %{name} -N
 
 %patch0 -p1 -b .backup
-%patch1 -p1 -b .backup
 
 %if %{with ffmpeg}
 %patch2 -p1 -b .backup
@@ -228,7 +225,7 @@ sed -e 's| -O2 | -O0 |g' -i CMakeLists.txt ext/SPIRV-Cross/Makefile Tools/pauth_
 sed -e 's| -D_NDEBUG | -DDEBUG |g' -i CMakeLists.txt libretro/Makefile ext/SPIRV-Cross/Makefile
 sed -e 's| -DNDEBUG | -DDEBUG |g' -i ext/SPIRV-Cross/Makefile
 %else
-sed -e 's| -O3 | -O2 |g' -i CMakeLists.txt ext/SPIRV-Cross/Makefile Tools/pauth_tool/Makefile ext/armips/ext/tinyformat/Makefile
+sed -e 's| -O3 | -O2 |g' -i CMakeLists.txt ext/SPIRV-Cross/Makefile ext/armips/ext/tinyformat/Makefile
 %endif
 
 ## Remove spurious executable permissions
@@ -352,8 +349,6 @@ patchelf --set-rpath %{_libdir}/%{name} %{buildroot}%{_libdir}/%{name}/*.so*
 mkdir -p %{buildroot}%{_datadir}/%{name}
 cp -a build2/assets %{buildroot}%{_datadir}/%{name}/
 install -pm 644 Qt/languages/*.ts %{buildroot}%{_datadir}/%{name}/assets/lang/
-install -pm 644 korean.txt %{buildroot}%{_datadir}/%{name}/assets/lang/korean.ini
-install -pm 644 chinese.txt %{buildroot}%{_datadir}/%{name}/assets/lang/chinese.ini
 
 # Remove unnecessary files
 rm -rf %{buildroot}%{_includedir}
@@ -424,6 +419,9 @@ fi
 %{_datadir}/icons/%{name}/
 
 %changelog
+* Thu Jul 28 2022 Antonio Trande <sagitter@fedoraproject.org> - 1.13-1
+- Release 1.13 including bundled FFMpeg-3.0.2
+
 * Sun Feb 06 2022 Antonio Trande <sagitter@fedoraproject.org> - 1.12.3-2
 - Source archive re-generated including bundled FFMpeg
 - Rebuild against bundled FFMpeg-3.0.2 (upstream bug #15308)
