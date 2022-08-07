@@ -74,7 +74,7 @@ ExcludeArch: %{power64}
  
 Name:           ppsspp
 Version:        1.13
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        A PSP emulator
 License:        BSD and GPLv2+
 URL:            https://www.ppsspp.org/
@@ -419,6 +419,10 @@ fi
 %{_datadir}/icons/%{name}/
 
 %changelog
+* Sun Aug 07 2022 RPM Fusion Release Engineering <sergiomb@rpmfusion.org> - 1.13-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild and ffmpeg
+  5.1
+
 * Thu Jul 28 2022 Antonio Trande <sagitter@fedoraproject.org> - 1.13-1
 - Release 1.13 including bundled FFMpeg-3.0.2
 
