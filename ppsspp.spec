@@ -115,6 +115,7 @@ Patch0: %{name}-1.1.0-git-version.patch
 Patch2: %{name}-ffmpeg-set_x64_build_flags.patch
 Patch3: %{name}-ffmpeg-set_aarch64_build_flags.patch
 Patch4: %{name}-ffmpeg-set_arm_build_flags.patch
+Patch5: fix_compile_issue.patch
 
 BuildRequires:  pkgconfig(egl)
 BuildRequires:  pkgconfig(glesv2)
@@ -199,6 +200,7 @@ PPSSPP with Qt5 frontend wrapper.
 %patch2 -p1 -b .backup
 %patch3 -p1 -b .backup
 %patch4 -p1 -b .backup
+%patch5 -p1 -b .backup
 %endif
 
 # Remove bundled libraries
