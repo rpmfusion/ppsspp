@@ -73,8 +73,8 @@ ExcludeArch: %{power64}
  
  
 Name:           ppsspp
-Version:        1.13
-Release:        2%{?dist}
+Version:        1.13.1
+Release:        1%{?dist}
 Summary:        A PSP emulator
 License:        BSD and GPLv2+
 URL:            https://www.ppsspp.org/
@@ -83,8 +83,8 @@ URL:            https://www.ppsspp.org/
 ## We need to checkout it, then download relative submodules
 ## which are not included in the source code:
 ##
-# git clone -b v1.13 --depth 1 --single-branch --progress --recursive https://github.com/hrydgard/ppsspp.git
-# cd ppsspp/ffmpeg && git checkout ?70bfd4a77487e56ef60b4adfc47f714cfea59794
+# git clone -b v1.13.1 --depth 1 --single-branch --progress --recursive https://github.com/hrydgard/ppsspp.git
+# cd ppsspp/ffmpeg && git checkout 3ad7ddb9eb2af898dce8c4b5e9a28b77b3f7ddd7
 # rm -rf ios Windows* windows* macosx blackberry* gas-preprocessor symbian* wiiu
 # cd ..
 # rm -rf ios Windows* windows* macosx blackberry* symbian*
@@ -115,7 +115,7 @@ Patch0: %{name}-1.1.0-git-version.patch
 Patch2: %{name}-ffmpeg-set_x64_build_flags.patch
 Patch3: %{name}-ffmpeg-set_aarch64_build_flags.patch
 Patch4: %{name}-ffmpeg-set_arm_build_flags.patch
-Patch5: fix_compile_issue.patch
+Patch5: %{name}-fix_compile_issue.patch
 
 BuildRequires:  pkgconfig(egl)
 BuildRequires:  pkgconfig(glesv2)
@@ -421,6 +421,9 @@ fi
 %{_datadir}/icons/%{name}/
 
 %changelog
+* Tue Aug 09 2022 Antonio Trande <sagitter@fedoraproject.org> - 1.13.1-1
+- Release 1.13.1 including bundled FFMpeg-3.0.2
+
 * Sun Aug 07 2022 RPM Fusion Release Engineering <sergiomb@rpmfusion.org> - 1.13-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild and ffmpeg
   5.1
