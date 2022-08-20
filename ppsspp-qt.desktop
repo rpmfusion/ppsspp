@@ -3,7 +3,7 @@ Version=1.0
 Type=Application
 Terminal=false
 Name=PPSSPP Qt
-Exec=/usr/bin/PPSSPPQt
+Exec=env QT_QPA_PLATFORM=xcb /usr/bin/PPSSPPQt
 Icon=ppsspp
 X-Window-Icon=
 X-HildonDesk-ShowInToolbar=true

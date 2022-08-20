@@ -74,7 +74,7 @@ ExcludeArch: %{power64}
  
 Name:           ppsspp
 Version:        1.13.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        A PSP emulator
 License:        BSD and GPLv2+
 URL:            https://www.ppsspp.org/
@@ -421,6 +421,9 @@ fi
 %{_datadir}/icons/%{name}/
 
 %changelog
+* Sat Aug 20 2022 Antonio Trande <sagitter@fedoraproject.org> - 1.13.1-2
+- Fix QT_QPA_PLATFORM env variables
+
 * Tue Aug 09 2022 Antonio Trande <sagitter@fedoraproject.org> - 1.13.1-1
 - Release 1.13.1 including bundled FFMpeg-3.0.2
 

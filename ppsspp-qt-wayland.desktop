@@ -3,7 +3,7 @@ Version=1.0
 Type=Application
 Terminal=false
 Name=PPSSPP Qt for Wayland
-Exec=env QT_QPA_PLATFORM=xcb /usr/bin/PPSSPPQt
+Exec=env QT_QPA_PLATFORM=wayland /usr/bin/PPSSPPQt
 Icon=ppsspp
 X-Window-Icon=
 X-HildonDesk-ShowInToolbar=true
