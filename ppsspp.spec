@@ -73,8 +73,8 @@ ExcludeArch: %{power64}
  
  
 Name:           ppsspp
-Version:        1.13.1
-Release:        2%{?dist}
+Version:        1.13.2
+Release:        1%{?dist}
 Summary:        A PSP emulator
 License:        BSD and GPLv2+
 URL:            https://www.ppsspp.org/
@@ -116,6 +116,7 @@ Patch2: %{name}-ffmpeg-set_x64_build_flags.patch
 Patch3: %{name}-ffmpeg-set_aarch64_build_flags.patch
 Patch4: %{name}-ffmpeg-set_arm_build_flags.patch
 Patch5: %{name}-fix_compile_issue.patch
+Patch6: %{name}-use-qt6.patch
 
 BuildRequires:  pkgconfig(egl)
 BuildRequires:  pkgconfig(glesv2)
@@ -142,9 +143,9 @@ BuildRequires:  gcc gcc-c++
 BuildRequires:  libzip-devel
 BuildRequires:  snappy-devel
 BuildRequires:  zlib-devel
-BuildRequires:  qt5-qtbase-devel
-BuildRequires:  qt5-qttools-devel
-BuildRequires:  qt5-qtmultimedia-devel
+BuildRequires:  qt6-qtbase-devel
+BuildRequires:  qt6-qttools-devel
+BuildRequires:  qt6-qtmultimedia-devel
 BuildRequires:  libappstream-glib
 BuildRequires:  rapidjson-devel
 
@@ -202,6 +203,7 @@ PPSSPP with Qt5 frontend wrapper.
 %patch4 -p1 -b .backup
 %patch5 -p1 -b .backup
 %endif
+%patch6 -p1 -b .qt6_backup
 
 # Remove bundled libraries
 rm -rf /ext/native/ext/libzip
@@ -421,6 +423,9 @@ fi
 %{_datadir}/icons/%{name}/
 
 %changelog
+* Sat Sep 24 2022 Antonio Trande <sagitter@fedoraproject.org> - 1.13.2-1
+- Release 1.13.2
+
 * Sat Aug 20 2022 Antonio Trande <sagitter@fedoraproject.org> - 1.13.1-2
 - Fix QT_QPA_PLATFORM env variables
 
