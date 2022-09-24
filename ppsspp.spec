@@ -142,9 +142,9 @@ BuildRequires:  gcc gcc-c++
 BuildRequires:  libzip-devel
 BuildRequires:  snappy-devel
 BuildRequires:  zlib-devel
-BuildRequires:  qt6-qtbase-devel
-BuildRequires:  qt6-qttools-devel
-BuildRequires:  qt6-qtmultimedia-devel
+BuildRequires:  qt5-qtbase-devel
+BuildRequires:  qt5-qttools-devel
+BuildRequires:  qt5-qtmultimedia-devel
 BuildRequires:  libappstream-glib
 BuildRequires:  rapidjson-devel
 
