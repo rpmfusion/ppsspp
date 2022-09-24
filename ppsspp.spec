@@ -116,7 +116,6 @@ Patch2: %{name}-ffmpeg-set_x64_build_flags.patch
 Patch3: %{name}-ffmpeg-set_aarch64_build_flags.patch
 Patch4: %{name}-ffmpeg-set_arm_build_flags.patch
 Patch5: %{name}-fix_compile_issue.patch
-Patch6: %{name}-use-qt6.patch
 
 BuildRequires:  pkgconfig(egl)
 BuildRequires:  pkgconfig(glesv2)
@@ -203,7 +202,6 @@ PPSSPP with Qt5 frontend wrapper.
 %patch4 -p1 -b .backup
 %patch5 -p1 -b .backup
 %endif
-%patch6 -p1 -b .qt6_backup
 
 # Remove bundled libraries
 rm -rf /ext/native/ext/libzip
