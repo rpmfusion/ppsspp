@@ -413,7 +413,6 @@ fi
 %files data
 %doc README.md
 %license LICENSE.TXT
-%{_datadir}/pixmaps/ppsspp.svg
 %{_datadir}/%{name}/
 %{_datadir}/icons/hicolor/*/apps/%{name}.png
 %{_datadir}/icons/%{name}/
