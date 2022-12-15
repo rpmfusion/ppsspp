@@ -413,6 +413,8 @@ fi
 %files data
 %doc README.md
 %license LICENSE.TXT
+%{_datadir}/icons/hicolor/scalable/apps/ppsspp.svg
+%{_datadir}/mime/packages/ppsspp.xml
 %{_datadir}/%{name}/
 %{_datadir}/icons/hicolor/*/apps/%{name}.png
 %{_datadir}/icons/%{name}/
