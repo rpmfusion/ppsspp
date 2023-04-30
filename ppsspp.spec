@@ -73,7 +73,7 @@ ExcludeArch: %{power64}
  
  
 Name:           ppsspp
-Version:        1.14.4
+Version:        1.15
 Release:        1%{?dist}
 Summary:        A PSP emulator
 License:        BSD and GPLv2+
@@ -83,8 +83,8 @@ URL:            https://www.ppsspp.org/
 ## We need to checkout it, then download relative submodules
 ## which are not included in the source code:
 ##
-# git clone -b v1.14.4 --depth 1 --single-branch --progress --recursive https://github.com/hrydgard/ppsspp.git
-# cd ppsspp/ffmpeg && git checkout 98973e62e0653fcac12f277838ff3d76e786722b
+# git clone -b v1.15 --depth 1 --single-branch --progress --recursive https://github.com/hrydgard/ppsspp.git
+# cd ppsspp/ffmpeg
 # rm -rf ios Windows* windows* macosx blackberry* gas-preprocessor symbian* wiiu
 # cd ..
 # rm -rf ios Windows* windows* macosx blackberry* symbian*
@@ -193,12 +193,12 @@ PPSSPP with Qt5 frontend wrapper.
 %prep
 %autosetup -n %{name} -N
 
-%patch0 -p1 -b .backup
+%patch 0 -p1 -b .backup
 
 %if %{with ffmpeg}
-%patch2 -p1 -b .backup
-%patch3 -p1 -b .backup
-%patch4 -p1 -b .backup
+%patch 2 -p1 -b .backup
+%patch 3 -p1 -b .backup
+%patch 4 -p1 -b .backup
 %endif
 
 # Remove bundled libraries
@@ -420,6 +420,9 @@ fi
 %{_datadir}/icons/%{name}/
 
 %changelog
+* Sun Apr 30 2023 Antonio Trande <sagitter@fedoraproject.org> - 1.15-1
+- Release 1.15
+
 * Fri Jan 06 2023 Antonio Trande <sagitter@fedoraproject.org> - 1.14.4-1
 - Release 1.14.4
 
