@@ -1,6 +1,8 @@
 # https://github.com/hrydgard/ppsspp/issues/8823
 ExcludeArch: %{power64}
 
+%bcond_with qt
+
 # Filter private libraries
 %global __provides_exclude ^(%%(find %{buildroot}%{_libdir}/ppsspp -name '*.so' | xargs -n1 basename | sort -u | paste -s -d '|' -))
 %global __requires_exclude ^(%%(find %{buildroot}%{_libdir}/ppsspp -name '*.so' | xargs -n1 basename | sort -u | paste -s -d '|' -))
@@ -141,9 +143,11 @@ BuildRequires:  gcc gcc-c++
 BuildRequires:  libzip-devel
 BuildRequires:  snappy-devel
 BuildRequires:  zlib-devel
+%if %{with qt}
 BuildRequires:  qt5-qtbase-devel
 BuildRequires:  qt5-qttools-devel
 BuildRequires:  qt5-qtmultimedia-devel
+%endif
 BuildRequires:  libappstream-glib
 BuildRequires:  rapidjson-devel
 
@@ -178,9 +182,11 @@ Requires: %{name}-data = %{version}-%{release}
 Requires: %{name}-libs%{?_isa} = %{version}-%{release}
 Obsoletes: %{name} < 0:1.10.2
 Provides: %{name} = 0:%{version}-%{release}
+Obsoletes: %{name}-qt < 0:1.15.3-2
 %description sdl
 PPSSPP with SDL frontend.
 
+%if %{with qt}
 %package qt
 Summary: PPSSPP with Qt5 frontend wrapper
 Requires: %{name}-data = %{version}-%{release}
@@ -188,7 +194,7 @@ Requires: %{name}-libs%{?_isa} = %{version}-%{release}
 Obsoletes: %{name} < 0:1.10.2
 %description qt
 PPSSPP with Qt5 frontend wrapper.
-
+%endif
 
 %prep
 %autosetup -n %{name} -N
@@ -288,6 +294,7 @@ export CFLAGS="%{build_cflags} -fPIC -lEGL -lGLESv2"
  %{common_build_options}
 %make_build -C build
 
+%if %{with qt}
 mkdir -p build2
 %if %{with debug}
 export CXXFLAGS="-O0 -g -fPIC -lEGL -lGLESv2"
@@ -309,13 +316,18 @@ export CFLAGS="%{build_cflags} -fPIC -lEGL -lGLESv2"
  -DLIBRETRO:BOOL=ON \
  %{common_build_options}
 %make_build -C build2
+%endif
 
 %install
 %make_install -C build
 
 # Install PPSSPP executable
 mkdir -p %{buildroot}%{_bindir}
+%if %{with qt}
 install -pm 755 build2/PPSSPPQt %{buildroot}%{_bindir}/
+desktop-file-install -m 644 %SOURCE3 --dir=%{buildroot}%{_datadir}/applications
+desktop-file-install -m 644 %SOURCE5 --dir=%{buildroot}%{_datadir}/applications
+%endif
 install -pm 755 build/PPSSPPSDL %{buildroot}%{_bindir}/
 
 # Install libraries
@@ -361,8 +373,7 @@ install -pm 644 icons/icon-114.png %{buildroot}%{_datadir}/icons/%{name}/%{name}
 # Install desktop file
 mkdir -p %{buildroot}%{_datadir}/applications
 desktop-file-install -m 644 %SOURCE1 --dir=%{buildroot}%{_datadir}/applications
-desktop-file-install -m 644 %SOURCE3 --dir=%{buildroot}%{_datadir}/applications
-desktop-file-install -m 644 %SOURCE5 --dir=%{buildroot}%{_datadir}/applications
+
 
 # Already installed
 rm -f %{buildroot}%{_datadir}/applications/PPSSPPSDL.desktop
@@ -370,7 +381,9 @@ rm -f %{buildroot}%{_datadir}/applications/PPSSPPSDL.desktop
 # Install appdata file
 mkdir -p %{buildroot}%{_metainfodir}
 install -pm 644 %SOURCE2 %{buildroot}%{_metainfodir}/
+%if %{with qt}
 install -pm 644 %SOURCE4 %{buildroot}%{_metainfodir}/
+%endif
 appstream-util validate-relax --nonet %{buildroot}%{_metainfodir}/*.appdata.xml
 
 %if 0%{?rhel}
@@ -394,6 +407,7 @@ fi
 %{_datadir}/applications/%{name}.desktop
 %{_metainfodir}/%{name}.appdata.xml
 
+%if %{with qt}
 %files qt
 %doc README.md
 %license LICENSE.TXT
@@ -401,6 +415,7 @@ fi
 %{_datadir}/applications/%{name}-qt.desktop
 %{_datadir}/applications/%{name}-qt-wayland.desktop
 %{_metainfodir}/%{name}-qt.appdata.xml
+%endif
 
 %files libs
 %doc README.md
