@@ -431,9 +431,7 @@ fi
 %license LICENSE.TXT
 %{_datadir}/icons/hicolor/scalable/apps/ppsspp.svg
 %{_datadir}/mime/packages/ppsspp.xml
-%if %{with qt}
 %{_datadir}/%{name}/
-%endif
 %{_datadir}/icons/hicolor/*/apps/%{name}.png
 %{_datadir}/icons/%{name}/
 
