@@ -332,7 +332,13 @@ install -pm 755 build/PPSSPPSDL %{buildroot}%{_bindir}/
 
 # Install libraries
 mkdir -p %{buildroot}%{_libdir}/%{name}
+%if %{with qt}
 cp -a build2/lib/*.so* %{buildroot}%{_libdir}/%{name}/
+# Install data files
+mkdir -p %{buildroot}%{_datadir}/%{name}
+cp -a build2/assets %{buildroot}%{_datadir}/%{name}/
+install -pm 644 Qt/languages/*.ts %{buildroot}%{_datadir}/%{name}/assets/lang/
+%endif
 cp -u build/lib/*.so* %{buildroot}%{_libdir}/%{name}/
 
 %if %{with ffmpeg}
@@ -356,11 +362,6 @@ popd
 # Fix rpaths
 patchelf --set-rpath %{_libdir}/%{name} %{buildroot}%{_bindir}/PPSSPP*
 patchelf --set-rpath %{_libdir}/%{name} %{buildroot}%{_libdir}/%{name}/*.so*
-
-# Install data files
-mkdir -p %{buildroot}%{_datadir}/%{name}
-cp -a build2/assets %{buildroot}%{_datadir}/%{name}/
-install -pm 644 Qt/languages/*.ts %{buildroot}%{_datadir}/%{name}/assets/lang/
 
 # Remove unnecessary files
 rm -rf %{buildroot}%{_includedir}
@@ -430,7 +431,9 @@ fi
 %license LICENSE.TXT
 %{_datadir}/icons/hicolor/scalable/apps/ppsspp.svg
 %{_datadir}/mime/packages/ppsspp.xml
+%if %{with qt}
 %{_datadir}/%{name}/
+%endif
 %{_datadir}/icons/hicolor/*/apps/%{name}.png
 %{_datadir}/icons/%{name}/
 
