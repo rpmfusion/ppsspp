@@ -75,7 +75,7 @@ ExcludeArch: %{power64}
  
  
 Name:           ppsspp
-Version:        1.16.3
+Version:        1.16.4
 Release:        1%{?dist}
 Summary:        A PSP emulator
 License:        BSD and GPLv2+
@@ -436,6 +436,9 @@ fi
 %{_datadir}/icons/%{name}/
 
 %changelog
+* Wed Sep 27 2023 Antonio Trande <sagitter@fedoraproject.org> - 1.16.4-1
+- Release 1.16.4
+
 * Sun Sep 24 2023 Antonio Trande <sagitter@fedoraproject.org> - 1.16.3-1
 - Release 1.16.3
 
