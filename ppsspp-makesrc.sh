@@ -1,11 +1,11 @@
 #!/bin/bash
 
 VERSION=1.16.5
-URL=https://ftp.mozilla.org/pub/firefox/releases/${VERSION}esr/linux-x86_64/xpi/
+URL=https://github.com/hrydgard/ppsspp.git
 
 for u in $URL; do
   mkdir -p ppsspp && pushd ppsspp
-  git clone -b v$VERSION --depth 1 --single-branch --progress --recursive https://github.com/hrydgard/ppsspp.git
+  git clone -b v$VERSION --depth 1 --single-branch --progress --recursive $URL
   cd ppsspp/ffmpeg
   rm -rf ios Windows* windows* macosx blackberry* gas-preprocessor symbian* wiiu
   cd ..
