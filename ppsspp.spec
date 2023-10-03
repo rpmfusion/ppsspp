@@ -75,42 +75,27 @@ ExcludeArch: %{power64}
  
  
 Name:           ppsspp
-Version:        1.16.4
+Version:        1.16.5
 Release:        1%{?dist}
 Summary:        A PSP emulator
 License:        BSD and GPLv2+
 URL:            https://www.ppsspp.org/
 
-## This commit coincides with the commit of release %%{version}.
-## We need to checkout it, then download relative submodules
-## which are not included in the source code:
-##
-# git clone -b v1.16.3 --depth 1 --single-branch --progress --recursive https://github.com/hrydgard/ppsspp.git
-# cd ppsspp/ffmpeg
-# rm -rf ios Windows* windows* macosx blackberry* gas-preprocessor symbian* wiiu
-# cd ..
-# rm -rf ios Windows* windows* macosx blackberry* symbian*
-# rm -rf dx9sdk pspautotests MoltenVK
-# cd ..
-# (if not used) find ppsspp -type d \( -name "ffmpeg" \) -exec rm -rf {} ';'
-# find ppsspp/android -perm /644 -type f \( -name "*.a" \) -exec rm -f {} ';'
-# find ppsspp -type d \( -name ".git*" \) -exec rm -rf {} ';'
-# find ppsspp -type f \( -name ".gitignore" \) -exec rm -rf {} ';'
-# find ppsspp -type f \( -name "*.a" \) -exec rm -rf {} ';'
-# tar -czvf ppsspp-ffmpeg-%%{version}.tar.gz ppsspp
-##
+# Source code archive is made by executing this Bash script
+Source0:        %{name}-makesrc.sh
+
 %if %{with ffmpeg}
-Source0:        %{name}-ffmpeg-%{version}.tar.gz
+Source1:        %{name}-ffmpeg-%{version}.tar.gz
 %else
-Source0:        %{name}-%{version}.tar.gz
+Source2:        %{name}-%{version}.tar.gz
 %endif
-Source1:        %{name}.desktop
-Source2:        %{name}.appdata.xml
-Source3:        %{name}-qt.desktop
-Source4:        %{name}-qt.appdata.xml
+Source3:        %{name}.desktop
+Source4:        %{name}.appdata.xml
+Source5:        %{name}-qt.desktop
+Source6:        %{name}-qt.appdata.xml
 
 # See https://github.com/hrydgard/ppsspp/issues/13119
-Source5:        %{name}-qt-wayland.desktop
+Source7:        %{name}-qt-wayland.desktop
 
 # Fix version
 Patch0: %{name}-1.1.0-git-version.patch
@@ -197,7 +182,7 @@ PPSSPP with Qt5 frontend wrapper.
 %endif
 
 %prep
-%autosetup -n %{name} -N
+%setup -qT -b 1 -n %{name}
 
 %patch -P 0 -p1 -b .backup
 
@@ -325,8 +310,8 @@ export CFLAGS="%{build_cflags} -fPIC -lEGL -lGLESv2"
 mkdir -p %{buildroot}%{_bindir}
 %if %{with qt}
 install -pm 755 build2/PPSSPPQt %{buildroot}%{_bindir}/
-desktop-file-install -m 644 %SOURCE3 --dir=%{buildroot}%{_datadir}/applications
 desktop-file-install -m 644 %SOURCE5 --dir=%{buildroot}%{_datadir}/applications
+desktop-file-install -m 644 %SOURCE7 --dir=%{buildroot}%{_datadir}/applications
 %endif
 install -pm 755 build/PPSSPPSDL %{buildroot}%{_bindir}/
 
@@ -373,7 +358,7 @@ install -pm 644 icons/icon-114.png %{buildroot}%{_datadir}/icons/%{name}/%{name}
 
 # Install desktop file
 mkdir -p %{buildroot}%{_datadir}/applications
-desktop-file-install -m 644 %SOURCE1 --dir=%{buildroot}%{_datadir}/applications
+desktop-file-install -m 644 %SOURCE3 --dir=%{buildroot}%{_datadir}/applications
 
 
 # Already installed
@@ -381,9 +366,9 @@ rm -f %{buildroot}%{_datadir}/applications/PPSSPPSDL.desktop
 
 # Install appdata file
 mkdir -p %{buildroot}%{_metainfodir}
-install -pm 644 %SOURCE2 %{buildroot}%{_metainfodir}/
-%if %{with qt}
 install -pm 644 %SOURCE4 %{buildroot}%{_metainfodir}/
+%if %{with qt}
+install -pm 644 %SOURCE6 %{buildroot}%{_metainfodir}/
 %endif
 appstream-util validate-relax --nonet %{buildroot}%{_metainfodir}/*.appdata.xml
 
@@ -436,6 +421,9 @@ fi
 %{_datadir}/icons/%{name}/
 
 %changelog
+* Tue Oct 03 2023 Antonio Trande <sagitter@fedoraproject.org> - 1.16.5-1
+- Release 1.16.5
+
 * Wed Sep 27 2023 Antonio Trande <sagitter@fedoraproject.org> - 1.16.4-1
 - Release 1.16.4
 
