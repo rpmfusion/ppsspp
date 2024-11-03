@@ -1,6 +1,6 @@
 #!/bin/bash
 
-VERSION=1.17.1
+VERSION=1.18
 URL=https://github.com/hrydgard/ppsspp.git
 
 for u in $URL; do
