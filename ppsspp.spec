@@ -76,7 +76,7 @@ ExcludeArch: %{power64}
  
 Name:           ppsspp
 Version:        1.18
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        A PSP emulator
 License:        BSD and GPLv2+
 URL:            https://www.ppsspp.org/
@@ -421,6 +421,9 @@ fi
 %{_datadir}/icons/%{name}/
 
 %changelog
+* Tue Jan 28 2025 RPM Fusion Release Engineering <sergiomb@rpmfusion.org> - 1.18-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_42_Mass_Rebuild
+
 * Sun Nov 03 2024 Antonio Trande <sagitter@fedoraproject.org> - 1.18-1
 - Release 1.18
 
