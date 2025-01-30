@@ -1,0 +1,10 @@
+--- a/ext/glslang/SPIRV/SpvBuilder.orig.h	2025-01-30 19:05:20.000000000 +0100
++++ b/ext/glslang/SPIRV/SpvBuilder.h	2025-01-30 19:21:20.616291971 +0100
+@@ -47,6 +47,7 @@
+ #ifndef SpvBuilder_H
+ #define SpvBuilder_H
+ 
++#include <cstdint>
+ #include "Logger.h"
+ #include "spirv.hpp"
+ #include "spvIR.h"

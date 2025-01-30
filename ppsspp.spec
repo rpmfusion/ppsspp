@@ -54,6 +54,7 @@ ExcludeArch: %{power64}
 %endif \
  -DUSE_SYSTEM_LIBZIP:BOOL=ON \\\
  -DUSE_SYSTEM_SNAPPY:BOOL=ON \\\
+ -DUSE_VULKAN_DISPLAY_KHR:BOOL=ON \\\
  %ifarch %{ix86} \
  -DX86:BOOL=ON \\\
  %endif \
@@ -75,8 +76,8 @@ ExcludeArch: %{power64}
  
  
 Name:           ppsspp
-Version:        1.18
-Release:        2%{?dist}
+Version:        1.18.1
+Release:        1%{?dist}
 Summary:        A PSP emulator
 License:        BSD and GPLv2+
 URL:            https://www.ppsspp.org/
@@ -102,6 +103,7 @@ Patch0: %{name}-1.1.0-git-version.patch
 Patch2: %{name}-ffmpeg-set_x64_build_flags.patch
 Patch3: %{name}-ffmpeg-set_aarch64_build_flags.patch
 Patch4: %{name}-ffmpeg-set_arm_build_flags.patch
+Patch5: %{name}-1.18.1-fix_GCC15.patch
 
 BuildRequires:  pkgconfig(egl)
 BuildRequires:  pkgconfig(glesv2)
@@ -110,7 +112,7 @@ BuildRequires:  pkgconfig(opengl)
 %{?el7:BuildRequires: libglvnd-devel}
 %{?el7:BuildRequires: pkgconfig(libpng)}
 %{?el8:BuildRequires: pkgconfig(libpng16)}
-BuildRequires:  cmake3
+BuildRequires:  cmake
 BuildRequires:  make
 BuildRequires:  python%{python3_pkgversion}-devel
 BuildRequires:  python%{python3_pkgversion}-setuptools
@@ -161,22 +163,22 @@ Provides: bundled(libswscale) = 4
 %description libs
 Private libraries used by PPSSPP.
 
+%if %{without qt}
 %package sdl
 Summary: PPSSPP with SDL frontend
 Requires: %{name}-data = %{version}-%{release}
 Requires: %{name}-libs%{?_isa} = %{version}-%{release}
-Obsoletes: %{name} < 0:1.10.2
-Provides: %{name} = 0:%{version}-%{release}
-Obsoletes: %{name}-qt < 0:1.15.3-2
+Obsoletes: %{name}-qt < 0:%{version}-%{release}
 %description sdl
 PPSSPP with SDL frontend.
+%endif
 
 %if %{with qt}
 %package qt
 Summary: PPSSPP with Qt5 frontend wrapper
 Requires: %{name}-data = %{version}-%{release}
 Requires: %{name}-libs%{?_isa} = %{version}-%{release}
-Obsoletes: %{name} < 0:1.10.2
+Obsoletes: %{name}-sdl < 0:%{version}-%{release}
 %description qt
 PPSSPP with Qt5 frontend wrapper.
 %endif
@@ -191,6 +193,8 @@ PPSSPP with Qt5 frontend wrapper.
 %patch -P 3 -p1 -b .backup
 %patch -P 4 -p1 -b .backup
 %endif
+
+%patch -P 5 -p1 -b .backup
 
 # Remove bundled libraries
 rm -rf /ext/native/ext/libzip
@@ -273,35 +277,14 @@ export CFLAGS="%{build_cflags} -fPIC -lEGL -lGLESv2"
  -DUSING_EGL:BOOL=ON \
  -DUSING_GLES2:BOOL=ON \
  -DUSING_X11_VULKAN:BOOL=ON \
- -DUSE_WAYLAND_WSI:BOOL=ON \
+ -DUSE_WAYLAND_WSI:BOOL=OFF \
+ -DUSE_SYSTEM_LIBSDL2:BOOL=ON \\\
  -DLIBRETRO:BOOL=OFF \
- -DUSING_QT_UI:BOOL=OFF \
+%if %{with qt}
+ -DUSING_QT_UI:BOOL=ON \
+%endif
  %{common_build_options}
 %make_build -C build
-
-%if %{with qt}
-mkdir -p build2
-%if %{with debug}
-export CXXFLAGS="-O0 -g -fPIC -lEGL -lGLESv2"
-export CFLAGS="-O0 -g -fPIC -lEGL -lGLESv2"
-%cmake3 -B build2 -DCMAKE_BUILD_TYPE:STRING=RelWithDebInfo \
- -DCMAKE_C_FLAGS_RELWITHDEBINFO:STRING="-O0 -g -DDEBUG" \
- -DCMAKE_CXX_FLAGS_RELWITHDEBINFO:STRING="-O0 -g -DDEBUG" \
-%else
-export CXXFLAGS="%{build_cxxflags} -fPIC -lEGL -lGLESv2"
-export CFLAGS="%{build_cflags} -fPIC -lEGL -lGLESv2"
-%cmake3 -B build2 -DCMAKE_BUILD_TYPE:STRING=Release \
-%endif
- -DOpenGL_GL_PREFERENCE:STRING=GLVND \
- -DUSING_EGL:BOOL=ON \
- -DUSING_GLES2:BOOL=ON \
- -DUSING_X11_VULKAN:BOOL=ON \
- -DUSE_WAYLAND_WSI:BOOL=ON \
- -DUSING_QT_UI:BOOL=ON \
- -DLIBRETRO:BOOL=ON \
- %{common_build_options}
-%make_build -C build2
-%endif
 
 %install
 %make_install -C build
@@ -309,19 +292,21 @@ export CFLAGS="%{build_cflags} -fPIC -lEGL -lGLESv2"
 # Install PPSSPP executable
 mkdir -p %{buildroot}%{_bindir}
 %if %{with qt}
-install -pm 755 build2/PPSSPPQt %{buildroot}%{_bindir}/
+install -pm 755 build/PPSSPPQt %{buildroot}%{_bindir}/
 desktop-file-install -m 644 %SOURCE5 --dir=%{buildroot}%{_datadir}/applications
 desktop-file-install -m 644 %SOURCE7 --dir=%{buildroot}%{_datadir}/applications
 %endif
+%if %{without qt}
 install -pm 755 build/PPSSPPSDL %{buildroot}%{_bindir}/
+%endif
 
 # Install libraries
 mkdir -p %{buildroot}%{_libdir}/%{name}
 %if %{with qt}
-cp -a build2/lib/*.so* %{buildroot}%{_libdir}/%{name}/
+cp -a build/lib/*.so* %{buildroot}%{_libdir}/%{name}/
 # Install data files
 mkdir -p %{buildroot}%{_datadir}/%{name}
-cp -a build2/assets %{buildroot}%{_datadir}/%{name}/
+cp -a build/assets %{buildroot}%{_datadir}/%{name}/
 install -pm 644 Qt/languages/*.ts %{buildroot}%{_datadir}/%{name}/assets/lang/
 %endif
 cp -u build/lib/*.so* %{buildroot}%{_libdir}/%{name}/
@@ -358,40 +343,32 @@ install -pm 644 icons/icon-114.png %{buildroot}%{_datadir}/icons/%{name}/%{name}
 
 # Install desktop file
 mkdir -p %{buildroot}%{_datadir}/applications
+%if %{without qt}
 desktop-file-install -m 644 %SOURCE3 --dir=%{buildroot}%{_datadir}/applications
+%endif
 
 
 # Already installed
 rm -f %{buildroot}%{_datadir}/applications/PPSSPPSDL.desktop
+rm -f %{buildroot}%{_datadir}/applications/PPSSPPQt.desktop
 
 # Install appdata file
 mkdir -p %{buildroot}%{_metainfodir}
-install -pm 644 %SOURCE4 %{buildroot}%{_metainfodir}/
 %if %{with qt}
 install -pm 644 %SOURCE6 %{buildroot}%{_metainfodir}/
+%else
+install -pm 644 %SOURCE4 %{buildroot}%{_metainfodir}/
 %endif
 appstream-util validate-relax --nonet %{buildroot}%{_metainfodir}/*.appdata.xml
 
-%if 0%{?rhel}
-%post
-/bin/touch --no-create %{_datadir}/icons/%{name} &>/dev/null || :
-
-%postun
-if [ $1 -eq 0 ] ; then
-    /bin/touch --no-create %{_datadir}/icons/%{name} &>/dev/null
-    /usr/bin/gtk-update-icon-cache %{_datadir}/icons/%{name} &>/dev/null || :
-fi
-
-%posttrans
-/usr/bin/gtk-update-icon-cache %{_datadir}/icons/%{name} &>/dev/null || :
-%endif
-
+%if %{without qt}
 %files sdl
 %doc README.md
 %license LICENSE.TXT
 %{_bindir}/PPSSPPSDL
 %{_datadir}/applications/%{name}.desktop
 %{_metainfodir}/%{name}.appdata.xml
+%endif
 
 %if %{with qt}
 %files qt
@@ -421,6 +398,9 @@ fi
 %{_datadir}/icons/%{name}/
 
 %changelog
+* Thu Jan 30 2025 Antonio Trande <sagitter@fedoraproject.org> - 1.18.1-1
+- Release 1.18.1
+
 * Tue Jan 28 2025 RPM Fusion Release Engineering <sergiomb@rpmfusion.org> - 1.18-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_42_Mass_Rebuild
 
