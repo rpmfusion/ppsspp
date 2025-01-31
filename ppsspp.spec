@@ -77,7 +77,7 @@ ExcludeArch: %{power64}
  
 Name:           ppsspp
 Version:        1.18.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        A PSP emulator
 License:        BSD and GPLv2+
 URL:            https://www.ppsspp.org/
@@ -311,6 +311,13 @@ install -pm 644 Qt/languages/*.ts %{buildroot}%{_datadir}/%{name}/assets/lang/
 %endif
 cp -u build/lib/*.so* %{buildroot}%{_libdir}/%{name}/
 
+pushd %{buildroot}%{_libdir}/%{name}
+ln -sf libglslang.so.12.0.0 libglslang.so
+ln -sf libglslang.so.12.0.0 libglslang.so.12
+ln -sf libSPIRV.so.12.0.0 libSPIRV.so
+ln -sf libSPIRV.so.12.0.0 libSPIRV.so.12
+popd
+
 %if %{with ffmpeg}
 pushd ffmpeg/linux/%{__arch}/lib
 install -pm 755 *.so* %{buildroot}%{_libdir}/%{name}/
@@ -398,6 +405,9 @@ appstream-util validate-relax --nonet %{buildroot}%{_metainfodir}/*.appdata.xml
 %{_datadir}/icons/%{name}/
 
 %changelog
+* Fri Jan 31 2025 Antonio Trande <sagitter@fedoraproject.org> - 1.18.1-2
+- Fix libraries link
+
 * Thu Jan 30 2025 Antonio Trande <sagitter@fedoraproject.org> - 1.18.1-1
 - Release 1.18.1
 
