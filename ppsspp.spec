@@ -77,7 +77,7 @@ ExcludeArch: %{power64}
  
 Name:           ppsspp
 Version:        1.18.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        A PSP emulator
 License:        BSD and GPLv2+
 URL:            https://www.ppsspp.org/
@@ -277,7 +277,7 @@ export CFLAGS="%{build_cflags} -fPIC -lEGL -lGLESv2"
  -DUSING_EGL:BOOL=ON \
  -DUSING_GLES2:BOOL=ON \
  -DUSING_X11_VULKAN:BOOL=ON \
- -DUSE_WAYLAND_WSI:BOOL=OFF \
+ -DUSE_WAYLAND_WSI:BOOL=ON \
  -DUSE_SYSTEM_LIBSDL2:BOOL=ON \\\
  -DLIBRETRO:BOOL=OFF \
 %if %{with qt}
@@ -405,6 +405,9 @@ appstream-util validate-relax --nonet %{buildroot}%{_metainfodir}/*.appdata.xml
 %{_datadir}/icons/%{name}/
 
 %changelog
+* Sun Apr 06 2025 Antonio Trande <sagitter@fedoraproject.org> - 1.18.1-3
+- Active USE_WAYLAND_WSI CMake option
+
 * Fri Jan 31 2025 Antonio Trande <sagitter@fedoraproject.org> - 1.18.1-2
 - Fix libraries link
 
