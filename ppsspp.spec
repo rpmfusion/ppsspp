@@ -16,7 +16,7 @@ ExcludeArch: %{power64}
 # -Wl,--as-needed breaks linking
 %undefine _ld_as_needed
 
-# Use bundled FFMpeg-3.0.2
+# Use bundled FFMpeg
 # See RPM Fusion bz#5889, and upstream bug #15308
 %bcond_without ffmpeg
 
@@ -54,7 +54,7 @@ ExcludeArch: %{power64}
 %endif \
  -DUSE_SYSTEM_LIBZIP:BOOL=ON \\\
  -DUSE_SYSTEM_SNAPPY:BOOL=ON \\\
- -DUSE_VULKAN_DISPLAY_KHR:BOOL=ON \\\
+ -DUSE_SYSTEM_MINIUPNPC:BOOL=ON \\\
  %ifarch %{ix86} \
  -DX86:BOOL=ON \\\
  %endif \
@@ -67,6 +67,7 @@ ExcludeArch: %{power64}
  %ifarch x86_64 \
  -DX86_64:BOOL=ON \\\
  %endif \
+ -DBUILD_SHARED_LIBS:BOOL=OFF \\\
  -DBUILD_TESTING:BOOL=OFF \\\
  -DENABLE_GLSLANG_BINARIES:BOOL=OFF \\\
  -DENABLE_HLSL:BOOL=OFF \\\
@@ -76,8 +77,8 @@ ExcludeArch: %{power64}
  
  
 Name:           ppsspp
-Version:        1.18.1
-Release:        3%{?dist}
+Version:        1.19.2
+Release:        1%{?dist}
 Summary:        A PSP emulator
 License:        BSD and GPLv2+
 URL:            https://www.ppsspp.org/
@@ -114,8 +115,8 @@ BuildRequires:  pkgconfig(opengl)
 %{?el8:BuildRequires: pkgconfig(libpng16)}
 BuildRequires:  cmake
 BuildRequires:  make
-BuildRequires:  python%{python3_pkgversion}-devel
-BuildRequires:  python%{python3_pkgversion}-setuptools
+BuildRequires:  python3-devel
+BuildRequires:  python3-setuptools
 BuildRequires:  patchelf
 BuildRequires:  desktop-file-utils
 %if %{without ffmpeg}
@@ -126,8 +127,11 @@ BuildRequires:  pkgconfig(glu)
 BuildRequires:  wayland-devel
 BuildRequires:  snappy-devel
 BuildRequires:  SDL2-devel
-BuildRequires:  gcc gcc-c++
+BuildRequires:  SDL2_ttf-devel
+BuildRequires:  gcc
+BuildRequires:  gcc-c++
 BuildRequires:  libzip-devel
+Buildrequires:  miniupnpc-devel
 BuildRequires:  snappy-devel
 BuildRequires:  zlib-devel
 %if %{with qt}
@@ -263,22 +267,25 @@ popd
 
 mkdir -p build
 %if %{with debug}
-export CXXFLAGS="-O0 -g -fPIC -lEGL -lGLESv2"
-export CFLAGS="-O0 -g -fPIC -lEGL -lGLESv2"
-%cmake3 -B build -DCMAKE_BUILD_TYPE:STRING=RelWithDebInfo \
+export CXXFLAGS="-O0 -g -lEGL -lGLESv2"
+export CFLAGS="-O0 -g -lEGL -lGLESv2"
+%cmake -B build -DCMAKE_BUILD_TYPE:STRING=RelWithDebInfo \
  -DCMAKE_C_FLAGS_RELWITHDEBINFO:STRING="-O0 -g -DDEBUG" \
  -DCMAKE_CXX_FLAGS_RELWITHDEBINFO:STRING="-O0 -g -DDEBUG" \
 %else
-export CXXFLAGS="%{build_cxxflags} -fPIC -lEGL -lGLESv2"
-export CFLAGS="%{build_cflags} -fPIC -lEGL -lGLESv2"
-%cmake3 -B build -DCMAKE_BUILD_TYPE:STRING=Release \
+export CXXFLAGS="%{build_cxxflags} -lEGL -lGLESv2"
+export CFLAGS="%{build_cflags} -lEGL -lGLESv2"
+%cmake -B build -DCMAKE_BUILD_TYPE:STRING=Release \
+ -DCMAKE_C_FLAGS_RELEASE:STRING="%{build_cxxflags} -lEGL -lGLESv2" \
+ -DCMAKE_CXX_FLAGS_RELEASE:STRING="%{build_cflags} -lEGL -lGLESv2" \
 %endif
  -DOpenGL_GL_PREFERENCE:STRING=GLVND \
  -DUSING_EGL:BOOL=ON \
  -DUSING_GLES2:BOOL=ON \
  -DUSING_X11_VULKAN:BOOL=ON \
+ -DUSE_VULKAN_DISPLAY_KHR:BOOL=ON \
  -DUSE_WAYLAND_WSI:BOOL=ON \
- -DUSE_SYSTEM_LIBSDL2:BOOL=ON \\\
+ -DUSE_SYSTEM_LIBSDL2:BOOL=ON \
  -DLIBRETRO:BOOL=OFF \
 %if %{with qt}
  -DUSING_QT_UI:BOOL=ON \
@@ -303,20 +310,13 @@ install -pm 755 build/PPSSPPSDL %{buildroot}%{_bindir}/
 # Install libraries
 mkdir -p %{buildroot}%{_libdir}/%{name}
 %if %{with qt}
-cp -a build/lib/*.so* %{buildroot}%{_libdir}/%{name}/
+cp -a build/lib/lib*.* %{buildroot}%{_libdir}/%{name}/
 # Install data files
 mkdir -p %{buildroot}%{_datadir}/%{name}
 cp -a build/assets %{buildroot}%{_datadir}/%{name}/
 install -pm 644 Qt/languages/*.ts %{buildroot}%{_datadir}/%{name}/assets/lang/
 %endif
-cp -u build/lib/*.so* %{buildroot}%{_libdir}/%{name}/
-
-pushd %{buildroot}%{_libdir}/%{name}
-ln -sf libglslang.so.12.0.0 libglslang.so
-ln -sf libglslang.so.12.0.0 libglslang.so.12
-ln -sf libSPIRV.so.12.0.0 libSPIRV.so
-ln -sf libSPIRV.so.12.0.0 libSPIRV.so.12
-popd
+cp -u build/lib/lib*.* %{buildroot}%{_libdir}/%{name}/
 
 %if %{with ffmpeg}
 pushd ffmpeg/linux/%{__arch}/lib
@@ -405,6 +405,11 @@ appstream-util validate-relax --nonet %{buildroot}%{_metainfodir}/*.appdata.xml
 %{_datadir}/icons/%{name}/
 
 %changelog
+* Tue Jun 17 2025 Antonio Trande <sagitter@fedoraproject.org> - 1.19.2-1
+- Release 1.19.2
+- Explicitely disable BUILD_SHARED_LIBS CMake option
+- Use SYSTEM_MINIUPNPC
+
 * Sun Apr 06 2025 Antonio Trande <sagitter@fedoraproject.org> - 1.18.1-3
 - Active USE_WAYLAND_WSI CMake option
 
