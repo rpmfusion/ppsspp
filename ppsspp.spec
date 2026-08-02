@@ -37,6 +37,7 @@ ExcludeArch: %{power64}
 %bcond_with debug
 
 %global common_build_options \\\
+ -G "Unix Makefiles"  \\\
  -DCMAKE_INSTALL_LIBDIR:PATH=%{_lib}/%{name} \\\
  -DPYTHON_EXECUTABLE:FILEPATH=%{__python3} \\\
  -Wno-dev -DARMIPS_REGEXP:BOOL=OFF \\\
@@ -74,8 +75,8 @@ ExcludeArch: %{power64}
  -DOPENGL_xmesa_INCLUDE_DIR:PATH= \\\
  -DHEADLESS=OFF -DZLIB_INCLUDE_DIR:PATH=%{_includedir} \\\
  -DPNG_PNG_INCLUDE_DIR:PATH=%{_includedir}
- 
- 
+
+
 Name:           ppsspp
 Version:        1.19.2
 Release:        4%{?dist}
@@ -279,6 +280,7 @@ export CFLAGS="%{build_cflags} -lEGL -lGLESv2"
  -DCMAKE_C_FLAGS_RELEASE:STRING="%{build_cxxflags} -lEGL -lGLESv2" \
  -DCMAKE_CXX_FLAGS_RELEASE:STRING="%{build_cflags} -lEGL -lGLESv2" \
 %endif
+ -G "Unix Makefiles"  \
  -DOpenGL_GL_PREFERENCE:STRING=GLVND \
  -DUSING_EGL:BOOL=ON \
  -DUSING_GLES2:BOOL=ON \
